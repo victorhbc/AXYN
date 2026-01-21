@@ -4,7 +4,7 @@ void main() {
   runApp(const MainApp());
 }
 
-// Simple store for calculation results
+// Simple store for calculation results and form values
 class CalculationStore extends ChangeNotifier {
   static final CalculationStore _instance = CalculationStore._internal();
   factory CalculationStore() => _instance;
@@ -12,6 +12,31 @@ class CalculationStore extends ChangeNotifier {
 
   final Map<String, double?> _results = {};
   final Map<String, String?> _classifications = {};
+  final Map<String, Map<String, dynamic>> _formValues = {};
+
+  // Shared patient data across calculators
+  String _sharedPeso = '';
+  String _sharedAltura = '';
+  String _sharedIdade = '';
+
+  String get sharedPeso => _sharedPeso;
+  String get sharedAltura => _sharedAltura;
+  String get sharedIdade => _sharedIdade;
+
+  void setSharedPeso(String value) {
+    _sharedPeso = value;
+    notifyListeners();
+  }
+
+  void setSharedAltura(String value) {
+    _sharedAltura = value;
+    notifyListeners();
+  }
+
+  void setSharedIdade(String value) {
+    _sharedIdade = value;
+    notifyListeners();
+  }
 
   double? getResult(String key) => _results[key];
   String? getClassification(String key) => _classifications[key];
@@ -25,18 +50,52 @@ class CalculationStore extends ChangeNotifier {
   void clearResult(String key) {
     _results.remove(key);
     _classifications.remove(key);
+    _formValues.remove(key);
+    // Clear shared values based on which calculator is being cleared
+    _clearSharedValuesForKey(key);
     notifyListeners();
+  }
+
+  void _clearSharedValuesForKey(String key) {
+    switch (key) {
+      case 'imc':
+        _sharedPeso = '';
+        _sharedAltura = '';
+        break;
+      case 'creatinine_clearance':
+        _sharedIdade = '';
+        _sharedPeso = '';
+        break;
+      case 'dose_peso':
+        _sharedPeso = '';
+        break;
+    }
   }
 
   void clearAll() {
     _results.clear();
     _classifications.clear();
+    _formValues.clear();
+    _sharedPeso = '';
+    _sharedAltura = '';
+    _sharedIdade = '';
     notifyListeners();
   }
 
   bool hasResult(String key) => _results.containsKey(key) && _results[key] != null;
   
   bool get hasAnyResult => _results.values.any((v) => v != null);
+
+  // Form values storage
+  void setFormValues(String key, Map<String, dynamic> values) {
+    _formValues[key] = Map.from(values);
+  }
+
+  Map<String, dynamic>? getFormValues(String key) => _formValues[key];
+
+  void clearFormValues(String key) {
+    _formValues.remove(key);
+  }
 }
 
 class MainApp extends StatelessWidget {
@@ -527,9 +586,50 @@ class ImcCalculatorScreen extends StatefulWidget {
 class _ImcCalculatorScreenState extends State<ImcCalculatorScreen> {
   final _pesoController = TextEditingController();
   final _alturaController = TextEditingController();
+  final _store = CalculationStore();
   double? _imc;
   String _classificacao = '';
   Color _classificacaoColor = Colors.grey;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFormValues();
+  }
+
+  void _loadFormValues() {
+    // Load shared values first
+    if (_store.sharedPeso.isNotEmpty) {
+      _pesoController.text = _store.sharedPeso;
+    }
+    if (_store.sharedAltura.isNotEmpty) {
+      _alturaController.text = _store.sharedAltura;
+    }
+    // Then load specific form values
+    final values = _store.getFormValues('imc');
+    if (values != null) {
+      if (values['peso']?.isNotEmpty == true) _pesoController.text = values['peso'];
+      if (values['altura']?.isNotEmpty == true) _alturaController.text = values['altura'];
+      if (values['imc'] != null) {
+        _imc = values['imc'];
+        _classificacao = values['classificacao'] ?? '';
+        _classificacaoColor = _getClassificacaoColor(_imc!);
+      }
+    }
+  }
+
+  void _saveFormValues() {
+    // Save to shared values
+    _store.setSharedPeso(_pesoController.text);
+    _store.setSharedAltura(_alturaController.text);
+    // Save to form values
+    _store.setFormValues('imc', {
+      'peso': _pesoController.text,
+      'altura': _alturaController.text,
+      'imc': _imc,
+      'classificacao': _classificacao,
+    });
+  }
 
   void _calcularIMC() {
     final peso = double.tryParse(_pesoController.text.replaceAll(',', '.'));
@@ -555,8 +655,9 @@ class _ImcCalculatorScreenState extends State<ImcCalculatorScreen> {
       _classificacaoColor = _getClassificacaoColor(imc);
     });
 
-    // Save result to store
-    CalculationStore().setResult('imc', imc, classification: classificacao);
+    // Save result and form values to store
+    _store.setResult('imc', imc, classification: classificacao);
+    _saveFormValues();
   }
 
   String _getClassificacao(double imc) {
@@ -584,10 +685,13 @@ class _ImcCalculatorScreenState extends State<ImcCalculatorScreen> {
       _imc = null;
       _classificacao = '';
     });
+    _store.clearFormValues('imc');
+    _store.clearResult('imc');
   }
 
   @override
   void dispose() {
+    _saveFormValues();
     _pesoController.dispose();
     _alturaController.dispose();
     super.dispose();
@@ -803,10 +907,55 @@ class _CreatinineClearanceScreenState extends State<CreatinineClearanceScreen> {
   final _idadeController = TextEditingController();
   final _pesoController = TextEditingController();
   final _creatininaController = TextEditingController();
+  final _store = CalculationStore();
   bool _isFemale = false;
   double? _clearance;
   String _classificacao = '';
   Color _classificacaoColor = Colors.grey;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFormValues();
+  }
+
+  void _loadFormValues() {
+    // Load shared values first
+    if (_store.sharedIdade.isNotEmpty) {
+      _idadeController.text = _store.sharedIdade;
+    }
+    if (_store.sharedPeso.isNotEmpty) {
+      _pesoController.text = _store.sharedPeso;
+    }
+    // Then load specific form values
+    final values = _store.getFormValues('creatinine_clearance');
+    if (values != null) {
+      if (values['idade']?.isNotEmpty == true) _idadeController.text = values['idade'];
+      if (values['peso']?.isNotEmpty == true) _pesoController.text = values['peso'];
+      _creatininaController.text = values['creatinina'] ?? '';
+      _isFemale = values['isFemale'] ?? false;
+      if (values['clearance'] != null) {
+        _clearance = values['clearance'];
+        _classificacao = values['classificacao'] ?? '';
+        _classificacaoColor = _getClassificacaoColor(_clearance!);
+      }
+    }
+  }
+
+  void _saveFormValues() {
+    // Save to shared values
+    _store.setSharedIdade(_idadeController.text);
+    _store.setSharedPeso(_pesoController.text);
+    // Save to form values
+    _store.setFormValues('creatinine_clearance', {
+      'idade': _idadeController.text,
+      'peso': _pesoController.text,
+      'creatinina': _creatininaController.text,
+      'isFemale': _isFemale,
+      'clearance': _clearance,
+      'classificacao': _classificacao,
+    });
+  }
 
   void _calcularClearance() {
     final idade = int.tryParse(_idadeController.text);
@@ -837,8 +986,9 @@ class _CreatinineClearanceScreenState extends State<CreatinineClearanceScreen> {
       _classificacaoColor = _getClassificacaoColor(clearance);
     });
 
-    // Save result to store
-    CalculationStore().setResult('creatinine_clearance', clearance, classification: classificacao);
+    // Save result and form values to store
+    _store.setResult('creatinine_clearance', clearance, classification: classificacao);
+    _saveFormValues();
   }
 
   String _getClassificacao(double clearance) {
@@ -868,10 +1018,13 @@ class _CreatinineClearanceScreenState extends State<CreatinineClearanceScreen> {
       _clearance = null;
       _classificacao = '';
     });
+    _store.clearFormValues('creatinine_clearance');
+    _store.clearResult('creatinine_clearance');
   }
 
   @override
   void dispose() {
+    _saveFormValues();
     _idadeController.dispose();
     _pesoController.dispose();
     _creatininaController.dispose();
@@ -1166,7 +1319,31 @@ class DosePorPesoScreen extends StatefulWidget {
 class _DosePorPesoScreenState extends State<DosePorPesoScreen> {
   final _pesoController = TextEditingController();
   final _doseController = TextEditingController();
+  final _store = CalculationStore();
   double? _resultado;
+
+  @override
+  void initState() {
+    super.initState();
+    // Load shared weight first
+    if (_store.sharedPeso.isNotEmpty) {
+      _pesoController.text = _store.sharedPeso;
+    }
+    // Then load specific form values
+    final values = _store.getFormValues('dose_peso');
+    if (values != null) {
+      if (values['peso']?.isNotEmpty == true) _pesoController.text = values['peso'];
+      _doseController.text = values['dose'] ?? '';
+      _resultado = values['resultado'];
+    }
+  }
+
+  void _saveFormValues() {
+    // Save to shared values
+    _store.setSharedPeso(_pesoController.text);
+    // Save to form values
+    _store.setFormValues('dose_peso', {'peso': _pesoController.text, 'dose': _doseController.text, 'resultado': _resultado});
+  }
 
   void _calcular() {
     final peso = double.tryParse(_pesoController.text.replaceAll(',', '.'));
@@ -1181,7 +1358,8 @@ class _DosePorPesoScreenState extends State<DosePorPesoScreen> {
 
     final resultado = peso * doseMgKg;
     setState(() => _resultado = resultado);
-    CalculationStore().setResult('dose_peso', resultado, classification: 'Calculado');
+    _store.setResult('dose_peso', resultado, classification: 'Calculado');
+    _saveFormValues();
   }
 
   void _limpar() {
@@ -1190,10 +1368,13 @@ class _DosePorPesoScreenState extends State<DosePorPesoScreen> {
       _doseController.clear();
       _resultado = null;
     });
+    _store.clearFormValues('dose_peso');
+    _store.clearResult('dose_peso');
   }
 
   @override
   void dispose() {
+    _saveFormValues();
     _pesoController.dispose();
     _doseController.dispose();
     super.dispose();
@@ -1284,9 +1465,25 @@ class GlasgowScreen extends StatefulWidget {
 }
 
 class _GlasgowScreenState extends State<GlasgowScreen> {
+  final _store = CalculationStore();
   int _ocular = 0;
   int _verbal = 0;
   int _motor = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final values = _store.getFormValues('glasgow');
+    if (values != null) {
+      _ocular = values['ocular'] ?? 0;
+      _verbal = values['verbal'] ?? 0;
+      _motor = values['motor'] ?? 0;
+    }
+  }
+
+  void _saveFormValues() {
+    _store.setFormValues('glasgow', {'ocular': _ocular, 'verbal': _verbal, 'motor': _motor});
+  }
 
   int get _total => _ocular + _verbal + _motor;
 
@@ -1304,7 +1501,8 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
 
   void _salvar() {
     if (_total > 0) {
-      CalculationStore().setResult('glasgow', _total.toDouble(), classification: _getClassificacao(_total));
+      _store.setResult('glasgow', _total.toDouble(), classification: _getClassificacao(_total));
+      _saveFormValues();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Resultado salvo'), duration: Duration(seconds: 1)),
       );
@@ -1317,6 +1515,14 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
       _verbal = 0;
       _motor = 0;
     });
+    _store.clearFormValues('glasgow');
+    _store.clearResult('glasgow');
+  }
+
+  @override
+  void dispose() {
+    _saveFormValues();
+    super.dispose();
   }
 
   @override
@@ -1426,6 +1632,7 @@ class Cha2ds2VascScreen extends StatefulWidget {
 }
 
 class _Cha2ds2VascScreenState extends State<Cha2ds2VascScreen> {
+  final _store = CalculationStore();
   bool _chf = false;
   bool _hypertension = false;
   bool _age75 = false;
@@ -1434,6 +1641,29 @@ class _Cha2ds2VascScreenState extends State<Cha2ds2VascScreen> {
   bool _vascular = false;
   bool _age65 = false;
   bool _female = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final values = _store.getFormValues('cha2ds2vasc');
+    if (values != null) {
+      _chf = values['chf'] ?? false;
+      _hypertension = values['hypertension'] ?? false;
+      _age75 = values['age75'] ?? false;
+      _diabetes = values['diabetes'] ?? false;
+      _stroke = values['stroke'] ?? false;
+      _vascular = values['vascular'] ?? false;
+      _age65 = values['age65'] ?? false;
+      _female = values['female'] ?? false;
+    }
+  }
+
+  void _saveFormValues() {
+    _store.setFormValues('cha2ds2vasc', {
+      'chf': _chf, 'hypertension': _hypertension, 'age75': _age75, 'diabetes': _diabetes,
+      'stroke': _stroke, 'vascular': _vascular, 'age65': _age65, 'female': _female,
+    });
+  }
 
   int get _score {
     int s = 0;
@@ -1467,7 +1697,8 @@ class _Cha2ds2VascScreenState extends State<Cha2ds2VascScreen> {
   }
 
   void _salvar() {
-    CalculationStore().setResult('cha2ds2vasc', _score.toDouble(), classification: _getClassificacao(_score));
+    _store.setResult('cha2ds2vasc', _score.toDouble(), classification: _getClassificacao(_score));
+    _saveFormValues();
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Resultado salvo'), duration: Duration(seconds: 1)));
   }
 
@@ -1475,6 +1706,14 @@ class _Cha2ds2VascScreenState extends State<Cha2ds2VascScreen> {
     setState(() {
       _chf = _hypertension = _age75 = _diabetes = _stroke = _vascular = _age65 = _female = false;
     });
+    _store.clearFormValues('cha2ds2vasc');
+    _store.clearResult('cha2ds2vasc');
+  }
+
+  @override
+  void dispose() {
+    _saveFormValues();
+    super.dispose();
   }
 
   @override
@@ -1536,6 +1775,7 @@ class HasBledScreen extends StatefulWidget {
 }
 
 class _HasBledScreenState extends State<HasBledScreen> {
+  final _store = CalculationStore();
   bool _hypertension = false;
   bool _renal = false;
   bool _liver = false;
@@ -1545,6 +1785,30 @@ class _HasBledScreenState extends State<HasBledScreen> {
   bool _age = false;
   bool _drugs = false;
   bool _alcohol = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final values = _store.getFormValues('hasbled');
+    if (values != null) {
+      _hypertension = values['hypertension'] ?? false;
+      _renal = values['renal'] ?? false;
+      _liver = values['liver'] ?? false;
+      _stroke = values['stroke'] ?? false;
+      _bleeding = values['bleeding'] ?? false;
+      _labile = values['labile'] ?? false;
+      _age = values['age'] ?? false;
+      _drugs = values['drugs'] ?? false;
+      _alcohol = values['alcohol'] ?? false;
+    }
+  }
+
+  void _saveFormValues() {
+    _store.setFormValues('hasbled', {
+      'hypertension': _hypertension, 'renal': _renal, 'liver': _liver, 'stroke': _stroke,
+      'bleeding': _bleeding, 'labile': _labile, 'age': _age, 'drugs': _drugs, 'alcohol': _alcohol,
+    });
+  }
 
   int get _score {
     int s = 0;
@@ -1573,7 +1837,8 @@ class _HasBledScreenState extends State<HasBledScreen> {
   }
 
   void _salvar() {
-    CalculationStore().setResult('hasbled', _score.toDouble(), classification: _getClassificacao(_score));
+    _store.setResult('hasbled', _score.toDouble(), classification: _getClassificacao(_score));
+    _saveFormValues();
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Resultado salvo'), duration: Duration(seconds: 1)));
   }
 
@@ -1581,6 +1846,14 @@ class _HasBledScreenState extends State<HasBledScreen> {
     setState(() {
       _hypertension = _renal = _liver = _stroke = _bleeding = _labile = _age = _drugs = _alcohol = false;
     });
+    _store.clearFormValues('hasbled');
+    _store.clearResult('hasbled');
+  }
+
+  @override
+  void dispose() {
+    _saveFormValues();
+    super.dispose();
   }
 
   @override
@@ -1641,6 +1914,7 @@ class WellsTepScreen extends StatefulWidget {
 }
 
 class _WellsTepScreenState extends State<WellsTepScreen> {
+  final _store = CalculationStore();
   bool _dvtSymptoms = false;
   bool _noAlternative = false;
   bool _hr100 = false;
@@ -1648,6 +1922,28 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
   bool _previousDvtPe = false;
   bool _hemoptysis = false;
   bool _malignancy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final values = _store.getFormValues('wells_tep');
+    if (values != null) {
+      _dvtSymptoms = values['dvtSymptoms'] ?? false;
+      _noAlternative = values['noAlternative'] ?? false;
+      _hr100 = values['hr100'] ?? false;
+      _immobilization = values['immobilization'] ?? false;
+      _previousDvtPe = values['previousDvtPe'] ?? false;
+      _hemoptysis = values['hemoptysis'] ?? false;
+      _malignancy = values['malignancy'] ?? false;
+    }
+  }
+
+  void _saveFormValues() {
+    _store.setFormValues('wells_tep', {
+      'dvtSymptoms': _dvtSymptoms, 'noAlternative': _noAlternative, 'hr100': _hr100,
+      'immobilization': _immobilization, 'previousDvtPe': _previousDvtPe, 'hemoptysis': _hemoptysis, 'malignancy': _malignancy,
+    });
+  }
 
   double get _score {
     double s = 0;
@@ -1680,7 +1976,8 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
   }
 
   void _salvar() {
-    CalculationStore().setResult('wells_tep', _score, classification: _getClassificacao(_score));
+    _store.setResult('wells_tep', _score, classification: _getClassificacao(_score));
+    _saveFormValues();
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Resultado salvo'), duration: Duration(seconds: 1)));
   }
 
@@ -1688,6 +1985,14 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
     setState(() {
       _dvtSymptoms = _noAlternative = _hr100 = _immobilization = _previousDvtPe = _hemoptysis = _malignancy = false;
     });
+    _store.clearFormValues('wells_tep');
+    _store.clearResult('wells_tep');
+  }
+
+  @override
+  void dispose() {
+    _saveFormValues();
+    super.dispose();
   }
 
   @override
@@ -1750,7 +2055,25 @@ class SodiumCorrectionScreen extends StatefulWidget {
 class _SodiumCorrectionScreenState extends State<SodiumCorrectionScreen> {
   final _sodiumController = TextEditingController();
   final _glucoseController = TextEditingController();
+  final _store = CalculationStore();
   double? _correctedSodium;
+
+  @override
+  void initState() {
+    super.initState();
+    final values = _store.getFormValues('sodium_correction');
+    if (values != null) {
+      _sodiumController.text = values['sodium'] ?? '';
+      _glucoseController.text = values['glucose'] ?? '';
+      _correctedSodium = values['correctedSodium'];
+    }
+  }
+
+  void _saveFormValues() {
+    _store.setFormValues('sodium_correction', {
+      'sodium': _sodiumController.text, 'glucose': _glucoseController.text, 'correctedSodium': _correctedSodium,
+    });
+  }
 
   void _calcular() {
     final sodium = double.tryParse(_sodiumController.text.replaceAll(',', '.'));
@@ -1766,7 +2089,8 @@ class _SodiumCorrectionScreenState extends State<SodiumCorrectionScreen> {
     final classification = corrected < 135 ? 'Hiponatremia' : (corrected > 145 ? 'Hipernatremia' : 'Normal');
 
     setState(() => _correctedSodium = corrected);
-    CalculationStore().setResult('sodium_correction', corrected, classification: classification);
+    _store.setResult('sodium_correction', corrected, classification: classification);
+    _saveFormValues();
   }
 
   void _limpar() {
@@ -1775,6 +2099,8 @@ class _SodiumCorrectionScreenState extends State<SodiumCorrectionScreen> {
       _glucoseController.clear();
       _correctedSodium = null;
     });
+    _store.clearFormValues('sodium_correction');
+    _store.clearResult('sodium_correction');
   }
 
   Color _getColor(double sodium) {
@@ -1785,6 +2111,7 @@ class _SodiumCorrectionScreenState extends State<SodiumCorrectionScreen> {
 
   @override
   void dispose() {
+    _saveFormValues();
     _sodiumController.dispose();
     _glucoseController.dispose();
     super.dispose();
@@ -1859,7 +2186,26 @@ class _OsmolarityScreenState extends State<OsmolarityScreen> {
   final _sodiumController = TextEditingController();
   final _glucoseController = TextEditingController();
   final _ureaController = TextEditingController();
+  final _store = CalculationStore();
   double? _osmolarity;
+
+  @override
+  void initState() {
+    super.initState();
+    final values = _store.getFormValues('osmolarity');
+    if (values != null) {
+      _sodiumController.text = values['sodium'] ?? '';
+      _glucoseController.text = values['glucose'] ?? '';
+      _ureaController.text = values['urea'] ?? '';
+      _osmolarity = values['osmolarity'];
+    }
+  }
+
+  void _saveFormValues() {
+    _store.setFormValues('osmolarity', {
+      'sodium': _sodiumController.text, 'glucose': _glucoseController.text, 'urea': _ureaController.text, 'osmolarity': _osmolarity,
+    });
+  }
 
   void _calcular() {
     final sodium = double.tryParse(_sodiumController.text.replaceAll(',', '.'));
@@ -1876,7 +2222,8 @@ class _OsmolarityScreenState extends State<OsmolarityScreen> {
     final classification = osm < 280 ? 'Hipo-osmolar' : (osm > 295 ? 'Hiperosmolar' : 'Normal');
 
     setState(() => _osmolarity = osm);
-    CalculationStore().setResult('osmolarity', osm, classification: classification);
+    _store.setResult('osmolarity', osm, classification: classification);
+    _saveFormValues();
   }
 
   void _limpar() {
@@ -1886,6 +2233,8 @@ class _OsmolarityScreenState extends State<OsmolarityScreen> {
       _ureaController.clear();
       _osmolarity = null;
     });
+    _store.clearFormValues('osmolarity');
+    _store.clearResult('osmolarity');
   }
 
   Color _getColor(double osm) {
@@ -1896,6 +2245,7 @@ class _OsmolarityScreenState extends State<OsmolarityScreen> {
 
   @override
   void dispose() {
+    _saveFormValues();
     _sodiumController.dispose();
     _glucoseController.dispose();
     _ureaController.dispose();
@@ -1976,15 +2326,31 @@ class GestationalAgeScreen extends StatefulWidget {
 }
 
 class _GestationalAgeScreenState extends State<GestationalAgeScreen> {
+  final _store = CalculationStore();
   DateTime? _dum;
   int? _semanas;
   int? _dias;
   DateTime? _dpp;
 
+  @override
+  void initState() {
+    super.initState();
+    final values = _store.getFormValues('gestational_age');
+    if (values != null && values['dum'] != null) {
+      _calcular(DateTime.parse(values['dum']));
+    }
+  }
+
+  void _saveFormValues() {
+    _store.setFormValues('gestational_age', {
+      'dum': _dum?.toIso8601String(),
+    });
+  }
+
   void _selectDate() async {
     final picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now().subtract(const Duration(days: 60)),
+      initialDate: _dum ?? DateTime.now().subtract(const Duration(days: 60)),
       firstDate: DateTime.now().subtract(const Duration(days: 300)),
       lastDate: DateTime.now(),
       helpText: 'Selecione a DUM',
@@ -2008,7 +2374,8 @@ class _GestationalAgeScreenState extends State<GestationalAgeScreen> {
       _dpp = dpp;
     });
 
-    CalculationStore().setResult('gestational_age', semanas.toDouble(), classification: 'Idade Gestacional');
+    _store.setResult('gestational_age', semanas.toDouble(), classification: 'Idade Gestacional');
+    _saveFormValues();
   }
 
   void _limpar() {
@@ -2018,6 +2385,14 @@ class _GestationalAgeScreenState extends State<GestationalAgeScreen> {
       _dias = null;
       _dpp = null;
     });
+    _store.clearFormValues('gestational_age');
+    _store.clearResult('gestational_age');
+  }
+
+  @override
+  void dispose() {
+    _saveFormValues();
+    super.dispose();
   }
 
   String _formatDate(DateTime date) {
