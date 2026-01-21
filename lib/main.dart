@@ -96,6 +96,26 @@ class CalculationStore extends ChangeNotifier {
   void clearFormValues(String key) {
     _formValues.remove(key);
   }
+
+  // Visible items management
+  List<String>? _visibleItemKeys;
+  
+  List<String>? get visibleItemKeys => _visibleItemKeys;
+
+  void setVisibleItemKeys(List<String> keys) {
+    _visibleItemKeys = List.from(keys);
+    notifyListeners();
+  }
+
+  void resetVisibleItems() {
+    _visibleItemKeys = null;
+    notifyListeners();
+  }
+
+  bool isItemVisible(String key) {
+    if (_visibleItemKeys == null) return true; // Show all by default
+    return _visibleItemKeys!.contains(key);
+  }
 }
 
 class MainApp extends StatelessWidget {
@@ -104,7 +124,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'PlantaoFacil',
+      title: 'AXYN',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
@@ -115,18 +135,56 @@ class MainApp extends StatelessWidget {
   }
 }
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
   @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _currentIndex = 0;
+
+  final List<Widget> _pages = [
+    const CalculosSection(),
+    const PediatriaSection(),
+    const SobreSection(),
+  ];
+
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: HomeSection(),
+    return Scaffold(
+      body: _pages[_currentIndex],
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.calculate_outlined),
+            selectedIcon: Icon(Icons.calculate),
+            label: 'Cálculos',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.medication_outlined),
+            selectedIcon: Icon(Icons.medication),
+            label: 'Pediatria',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.info_outline),
+            selectedIcon: Icon(Icons.info),
+            label: 'Sobre',
+          ),
+        ],
+      ),
     );
   }
 }
 
-class HomeItem {
+class CalculoItem {
   final String title;
   final String subtitle;
   final IconData icon;
@@ -134,7 +192,7 @@ class HomeItem {
   final String? storeKey;
   final String? resultUnit;
 
-  const HomeItem({
+  const CalculoItem({
     required this.title,
     required this.subtitle,
     required this.icon,
@@ -144,18 +202,18 @@ class HomeItem {
   });
 }
 
-class HomeSection extends StatefulWidget {
-  const HomeSection({super.key});
+class CalculosSection extends StatefulWidget {
+  const CalculosSection({super.key});
 
   @override
-  State<HomeSection> createState() => _HomeSectionState();
+  State<CalculosSection> createState() => _CalculosSectionState();
 }
 
-class _HomeSectionState extends State<HomeSection> {
+class _CalculosSectionState extends State<CalculosSection> {
   final CalculationStore _store = CalculationStore();
 
-  static final List<HomeItem> _items = [
-    const HomeItem(
+  static final List<CalculoItem> _allItems = [
+    const CalculoItem(
       title: 'Calculadora IMC',
       subtitle: 'Índice de Massa Corporal',
       icon: Icons.monitor_weight_outlined,
@@ -163,7 +221,7 @@ class _HomeSectionState extends State<HomeSection> {
       storeKey: 'imc',
       resultUnit: '',
     ),
-    const HomeItem(
+    const CalculoItem(
       title: 'Clearance Creatinina',
       subtitle: 'Função Renal',
       icon: Icons.water_drop_outlined,
@@ -171,7 +229,7 @@ class _HomeSectionState extends State<HomeSection> {
       storeKey: 'creatinine_clearance',
       resultUnit: 'mL/min',
     ),
-    const HomeItem(
+    const CalculoItem(
       title: 'Dose por Peso',
       subtitle: 'Cálculo de Medicamentos',
       icon: Icons.medication_outlined,
@@ -179,7 +237,7 @@ class _HomeSectionState extends State<HomeSection> {
       storeKey: 'dose_peso',
       resultUnit: '',
     ),
-    const HomeItem(
+    const CalculoItem(
       title: 'Glasgow',
       subtitle: 'Escala de Coma',
       icon: Icons.psychology_outlined,
@@ -187,7 +245,7 @@ class _HomeSectionState extends State<HomeSection> {
       storeKey: 'glasgow',
       resultUnit: 'pts',
     ),
-    const HomeItem(
+    const CalculoItem(
       title: 'CHA₂DS₂-VASc',
       subtitle: 'Risco de AVC',
       icon: Icons.favorite_outlined,
@@ -195,7 +253,7 @@ class _HomeSectionState extends State<HomeSection> {
       storeKey: 'cha2ds2vasc',
       resultUnit: 'pts',
     ),
-    const HomeItem(
+    const CalculoItem(
       title: 'HAS-BLED',
       subtitle: 'Risco de Sangramento',
       icon: Icons.bloodtype_outlined,
@@ -203,7 +261,7 @@ class _HomeSectionState extends State<HomeSection> {
       storeKey: 'hasbled',
       resultUnit: 'pts',
     ),
-    const HomeItem(
+    const CalculoItem(
       title: 'Wells TEP',
       subtitle: 'Embolia Pulmonar',
       icon: Icons.air_outlined,
@@ -211,7 +269,7 @@ class _HomeSectionState extends State<HomeSection> {
       storeKey: 'wells_tep',
       resultUnit: 'pts',
     ),
-    const HomeItem(
+    const CalculoItem(
       title: 'Correção Na⁺',
       subtitle: 'Sódio Corrigido',
       icon: Icons.science_outlined,
@@ -219,7 +277,7 @@ class _HomeSectionState extends State<HomeSection> {
       storeKey: 'sodium_correction',
       resultUnit: 'mEq/L',
     ),
-    const HomeItem(
+    const CalculoItem(
       title: 'Osmolaridade',
       subtitle: 'Osmolaridade Plasmática',
       icon: Icons.opacity_outlined,
@@ -227,7 +285,7 @@ class _HomeSectionState extends State<HomeSection> {
       storeKey: 'osmolarity',
       resultUnit: 'mOsm/L',
     ),
-    const HomeItem(
+    const CalculoItem(
       title: 'Idade Gestacional',
       subtitle: 'IG e DPP',
       icon: Icons.pregnant_woman_outlined,
@@ -236,6 +294,11 @@ class _HomeSectionState extends State<HomeSection> {
       resultUnit: '',
     ),
   ];
+
+  List<CalculoItem> get _visibleItems {
+    if (_store.visibleItemKeys == null) return _allItems;
+    return _allItems.where((item) => _store.isItemVisible(item.storeKey ?? '')).toList();
+  }
 
   @override
   void initState() {
@@ -253,9 +316,24 @@ class _HomeSectionState extends State<HomeSection> {
     setState(() {});
   }
 
+  void _openEditMode() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => _EditItemsSheet(
+        allItems: _allItems,
+        store: _store,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final hasAnyResult = _store.hasAnyResult;
+    final visibleItems = _visibleItems;
     
     return SafeArea(
       child: Padding(
@@ -267,47 +345,56 @@ class _HomeSectionState extends State<HomeSection> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Início',
+                  'Cálculos',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                 ),
-                if (hasAnyResult)
-                  TextButton.icon(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Limpar tudo'),
-                          content: const Text('Deseja limpar todos os resultados salvos?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Cancelar'),
-                            ),
-                            FilledButton(
-                              onPressed: () {
-                                _store.clearAll();
-                                Navigator.pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Todos os resultados foram limpos'),
-                                    duration: Duration(seconds: 1),
-                                  ),
-                                );
-                              },
-                              child: const Text('Limpar'),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.delete_outline, size: 18),
-                    label: const Text('Limpar tudo'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.red,
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: _openEditMode,
+                      icon: const Icon(Icons.edit_outlined),
+                      tooltip: 'Editar calculadoras',
                     ),
-                  ),
+                    if (hasAnyResult)
+                      TextButton.icon(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Limpar tudo'),
+                              content: const Text('Deseja limpar todos os resultados salvos?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('Cancelar'),
+                                ),
+                                FilledButton(
+                                  onPressed: () {
+                                    _store.clearAll();
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Todos os resultados foram limpos'),
+                                        duration: Duration(seconds: 1),
+                                      ),
+                                    );
+                                  },
+                                  child: const Text('Limpar'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.delete_outline, size: 18),
+                        label: const Text('Limpar tudo'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.red,
+                        ),
+                      ),
+                  ],
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -319,9 +406,9 @@ class _HomeSectionState extends State<HomeSection> {
                   mainAxisSpacing: 12,
                   childAspectRatio: 1.0,
                 ),
-                itemCount: _items.length,
+                itemCount: visibleItems.length,
                 itemBuilder: (context, index) {
-                  final item = _items[index];
+                  final item = visibleItems[index];
                   final hasResult = item.storeKey != null && _store.hasResult(item.storeKey!);
                   final result = item.storeKey != null ? _store.getResult(item.storeKey!) : null;
                   final classification = item.storeKey != null ? _store.getClassification(item.storeKey!) : null;
@@ -575,6 +662,633 @@ class _GridItem extends StatelessWidget {
   }
 }
 
+// Edit Items Bottom Sheet
+class _EditItemsSheet extends StatefulWidget {
+  final List<CalculoItem> allItems;
+  final CalculationStore store;
+
+  const _EditItemsSheet({
+    required this.allItems,
+    required this.store,
+  });
+
+  @override
+  State<_EditItemsSheet> createState() => _EditItemsSheetState();
+}
+
+class _EditItemsSheetState extends State<_EditItemsSheet> {
+  late List<String> _selectedKeys;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize with current visible items or all items if none set
+    if (widget.store.visibleItemKeys != null) {
+      _selectedKeys = List.from(widget.store.visibleItemKeys!);
+    } else {
+      _selectedKeys = widget.allItems.map((item) => item.storeKey ?? '').where((key) => key.isNotEmpty).toList();
+    }
+  }
+
+  void _toggleItem(String key) {
+    setState(() {
+      if (_selectedKeys.contains(key)) {
+        _selectedKeys.remove(key);
+      } else {
+        _selectedKeys.add(key);
+      }
+    });
+  }
+
+  void _selectAll() {
+    setState(() {
+      _selectedKeys = widget.allItems.map((item) => item.storeKey ?? '').where((key) => key.isNotEmpty).toList();
+    });
+  }
+
+  void _deselectAll() {
+    setState(() {
+      _selectedKeys.clear();
+    });
+  }
+
+  void _save() {
+    if (_selectedKeys.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Selecione pelo menos uma calculadora'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    // Preserve original order
+    final orderedKeys = widget.allItems
+        .map((item) => item.storeKey ?? '')
+        .where((key) => key.isNotEmpty && _selectedKeys.contains(key))
+        .toList();
+    widget.store.setVisibleItemKeys(orderedKeys);
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Calculadoras atualizadas'),
+        duration: Duration(seconds: 1),
+      ),
+    );
+  }
+
+  void _reset() {
+    widget.store.resetVisibleItems();
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Todas as calculadoras restauradas'),
+        duration: Duration(seconds: 1),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      minChildSize: 0.5,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (context, scrollController) {
+        return Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Editar Calculadoras',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      Row(
+                        children: [
+                          TextButton(
+                            onPressed: _selectAll,
+                            child: const Text('Todas'),
+                          ),
+                          TextButton(
+                            onPressed: _deselectAll,
+                            child: const Text('Nenhuma'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Selecione as calculadoras que deseja exibir.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.grey,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                controller: scrollController,
+                itemCount: widget.allItems.length,
+                itemBuilder: (context, index) {
+                  final item = widget.allItems[index];
+                  final key = item.storeKey ?? '';
+                  final isSelected = _selectedKeys.contains(key);
+                  
+                  return CheckboxListTile(
+                    value: isSelected,
+                    onChanged: (value) => _toggleItem(key),
+                    secondary: Icon(
+                      item.icon,
+                      color: isSelected 
+                          ? Theme.of(context).colorScheme.primary 
+                          : Colors.grey,
+                    ),
+                    title: Text(
+                      item.title,
+                      style: TextStyle(
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        color: isSelected ? null : Colors.grey,
+                      ),
+                    ),
+                    subtitle: Text(
+                      item.subtitle,
+                      style: TextStyle(
+                        color: isSelected ? Colors.grey : Colors.grey.shade400,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _reset,
+                      child: const Text('Restaurar Padrão'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: _save,
+                      child: Text('Salvar (${_selectedKeys.length})'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+// ==================== Pediatria SECTION ====================
+class PediatriaSection extends StatefulWidget {
+  const PediatriaSection({super.key});
+
+  @override
+  State<PediatriaSection> createState() => _PediatriaSectionState();
+}
+
+class _PediatriaSectionState extends State<PediatriaSection> {
+  double _peso = 10.0;
+  final CalculationStore _store = CalculationStore();
+
+  @override
+  void initState() {
+    super.initState();
+    // Load shared weight if available
+    if (_store.sharedPeso.isNotEmpty) {
+      final parsedPeso = double.tryParse(_store.sharedPeso.replaceAll(',', '.'));
+      if (parsedPeso != null && parsedPeso >= 1 && parsedPeso <= 200) {
+        _peso = parsedPeso;
+      }
+    }
+  }
+
+  void _onPesoChanged(double value) {
+    setState(() {
+      _peso = value;
+    });
+    _store.setSharedPeso(value.toStringAsFixed(1));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Pediatria',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 16),
+                // Weight selector
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.fitness_center,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Peso',
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              '${_peso.toStringAsFixed(1)} kg',
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    color: Theme.of(context).colorScheme.onPrimary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          activeTrackColor: Theme.of(context).colorScheme.primary,
+                          inactiveTrackColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                          thumbColor: Theme.of(context).colorScheme.primary,
+                          overlayColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                        ),
+                        child: Slider(
+                          value: _peso,
+                          min: 1,
+                          max: 200,
+                          divisions: 298,
+                          onChanged: _onPesoChanged,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('1 kg', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
+                          Text('200 kg', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Drug list
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              children: [
+                _DrugDosageCard(
+                  name: 'Paracetamol',
+                  icon: Icons.healing,
+                  color: Colors.blue,
+                  peso: _peso,
+                  doseMin: 10,
+                  doseMax: 15,
+                  frequency: 'a cada 4–6 horas',
+                  maxDaily: 75,
+                  maxDoses: 4,
+                  observation: 'Geralmente máx. 4 doses/dia',
+                ),
+                _DrugDosageCard(
+                  name: 'Ibuprofeno',
+                  icon: Icons.local_pharmacy,
+                  color: Colors.orange,
+                  peso: _peso,
+                  doseMin: 5,
+                  doseMax: 10,
+                  frequency: 'a cada 6–8 horas',
+                  maxDaily: 40,
+                  maxDoses: 3,
+                  observation: 'Uso apenas acima de 6 meses',
+                  restriction: '> 6 meses',
+                ),
+                _DrugDosageCard(
+                  name: 'Dipirona',
+                  icon: Icons.medication_liquid,
+                  color: Colors.purple,
+                  peso: _peso,
+                  doseMin: 10,
+                  doseMax: 15,
+                  frequency: 'a cada 6–8 horas',
+                  maxDoses: 4,
+                  observation: 'Respeitar protocolos institucionais',
+                ),
+                _DrugDosageCard(
+                  name: 'Amoxicilina',
+                  icon: Icons.vaccines,
+                  color: Colors.green,
+                  peso: _peso,
+                  doseMin: 25,
+                  doseMax: 50,
+                  frequency: '2 a 3 tomadas por dia',
+                  isDailyDose: true,
+                  divisions: [2, 3],
+                  observation: 'Duração típica: 7–10 dias',
+                ),
+                _DrugDosageCard(
+                  name: 'Loratadina',
+                  icon: Icons.air,
+                  color: Colors.teal,
+                  peso: _peso,
+                  doseMin: 0.2,
+                  doseMax: 0.2,
+                  frequency: '1 vez ao dia',
+                  isDailyDose: true,
+                  observation: 'Indicação: rinite alérgica, urticária',
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DrugDosageCard extends StatelessWidget {
+  final String name;
+  final IconData icon;
+  final Color color;
+  final double peso;
+  final double doseMin;
+  final double doseMax;
+  final String frequency;
+  final double? maxDaily;
+  final int? maxDoses;
+  final String? observation;
+  final String? restriction;
+  final bool isDailyDose;
+  final List<int>? divisions;
+
+  const _DrugDosageCard({
+    required this.name,
+    required this.icon,
+    required this.color,
+    required this.peso,
+    required this.doseMin,
+    required this.doseMax,
+    required this.frequency,
+    this.maxDaily,
+    this.maxDoses,
+    this.observation,
+    this.restriction,
+    this.isDailyDose = false,
+    this.divisions,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final doseMinCalc = peso * doseMin;
+    final doseMaxCalc = peso * doseMax;
+    final maxDailyCalc = maxDaily != null ? peso * maxDaily! : null;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          leading: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          title: Text(
+            name,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 4),
+              if (restriction != null)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    restriction!,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.amber.shade800,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ),
+              RichText(
+                text: TextSpan(
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  children: [
+                    TextSpan(
+                      text: isDailyDose ? 'Dose diária: ' : 'Dose: ',
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                    TextSpan(
+                      text: doseMin == doseMax
+                          ? '${doseMinCalc.toStringAsFixed(1)} mg'
+                          : '${doseMinCalc.toStringAsFixed(1)} – ${doseMaxCalc.toStringAsFixed(1)} mg',
+                      style: TextStyle(
+                        color: color,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  _buildInfoRow(context, 'Dose padrão', '${doseMin}–${doseMax} mg/kg${isDailyDose ? '/dia' : '/dose'}'),
+                  _buildInfoRow(context, 'Frequência', frequency),
+                  if (maxDailyCalc != null)
+                    _buildInfoRow(context, 'Dose máx. diária', '${maxDailyCalc.toStringAsFixed(1)} mg ($maxDaily mg/kg/dia)'),
+                  if (maxDoses != null)
+                    _buildInfoRow(context, 'Máx. doses/dia', '$maxDoses doses'),
+                  if (divisions != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      'Dose por tomada:',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    const SizedBox(height: 4),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: divisions!.map((div) {
+                        final dosePerTake = doseMaxCalc / div;
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: color.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '$div×/dia: ${dosePerTake.toStringAsFixed(1)} mg',
+                            style: TextStyle(
+                              color: color,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                  if (observation != null) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.info_outline, size: 16, color: Colors.grey.shade600),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              observation!,
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Colors.grey.shade700,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(BuildContext context, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey.shade600,
+                  ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // IMC Calculator Screen
 class ImcCalculatorScreen extends StatefulWidget {
   const ImcCalculatorScreen({super.key});
@@ -691,7 +1405,6 @@ class _ImcCalculatorScreenState extends State<ImcCalculatorScreen> {
 
   @override
   void dispose() {
-    _saveFormValues();
     _pesoController.dispose();
     _alturaController.dispose();
     super.dispose();
@@ -1024,7 +1737,6 @@ class _CreatinineClearanceScreenState extends State<CreatinineClearanceScreen> {
 
   @override
   void dispose() {
-    _saveFormValues();
     _idadeController.dispose();
     _pesoController.dispose();
     _creatininaController.dispose();
@@ -1374,7 +2086,6 @@ class _DosePorPesoScreenState extends State<DosePorPesoScreen> {
 
   @override
   void dispose() {
-    _saveFormValues();
     _pesoController.dispose();
     _doseController.dispose();
     super.dispose();
@@ -1521,7 +2232,6 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
 
   @override
   void dispose() {
-    _saveFormValues();
     super.dispose();
   }
 
@@ -1712,7 +2422,6 @@ class _Cha2ds2VascScreenState extends State<Cha2ds2VascScreen> {
 
   @override
   void dispose() {
-    _saveFormValues();
     super.dispose();
   }
 
@@ -1852,7 +2561,6 @@ class _HasBledScreenState extends State<HasBledScreen> {
 
   @override
   void dispose() {
-    _saveFormValues();
     super.dispose();
   }
 
@@ -1991,7 +2699,6 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
 
   @override
   void dispose() {
-    _saveFormValues();
     super.dispose();
   }
 
@@ -2111,7 +2818,6 @@ class _SodiumCorrectionScreenState extends State<SodiumCorrectionScreen> {
 
   @override
   void dispose() {
-    _saveFormValues();
     _sodiumController.dispose();
     _glucoseController.dispose();
     super.dispose();
@@ -2245,7 +2951,6 @@ class _OsmolarityScreenState extends State<OsmolarityScreen> {
 
   @override
   void dispose() {
-    _saveFormValues();
     _sodiumController.dispose();
     _glucoseController.dispose();
     _ureaController.dispose();
@@ -2391,7 +3096,6 @@ class _GestationalAgeScreenState extends State<GestationalAgeScreen> {
 
   @override
   void dispose() {
-    _saveFormValues();
     super.dispose();
   }
 
@@ -2500,6 +3204,281 @@ class _GestationalAgeScreenState extends State<GestationalAgeScreen> {
           Text(label, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey)),
           Text(value, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
         ],
+      ),
+    );
+  }
+}
+
+// ==================== SOBRE SECTION ====================
+class SobreSection extends StatelessWidget {
+  const SobreSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Sobre',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 24),
+            // App Info Card
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.primary,
+                    Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Icon(
+                      Icons.medical_services_outlined,
+                      size: 48,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'AXYN',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Versão 1.0.0',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.white.withOpacity(0.8),
+                        ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Calculadoras médicas e dosagens pediátricas para profissionais de saúde',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Terms and Legal
+            _buildSectionCard(
+              context,
+              title: 'Termos de Uso',
+              icon: Icons.description_outlined,
+              content: '''
+Ao utilizar o aplicativo AXYN, você concorda com os seguintes termos:
+
+1. FINALIDADE DO APLICATIVO
+Este aplicativo é uma ferramenta de apoio e referência para profissionais de saúde. Os cálculos e dosagens apresentados são baseados em diretrizes e literatura médica estabelecidas.
+
+2. ISENÇÃO DE RESPONSABILIDADE MÉDICA
+• As informações fornecidas NÃO substituem o julgamento clínico profissional
+• Todas as decisões médicas devem ser tomadas por profissionais qualificados
+• O desenvolvedor não se responsabiliza por decisões clínicas baseadas exclusivamente neste aplicativo
+• Sempre verifique as informações com fontes primárias e protocolos institucionais
+
+3. USO ADEQUADO
+• Este aplicativo destina-se exclusivamente a profissionais de saúde e estudantes da área
+• Os resultados devem ser sempre validados antes de qualquer aplicação clínica
+• O usuário assume total responsabilidade pelo uso das informações
+
+4. PRECISÃO DAS INFORMAÇÕES
+• Embora nos esforcemos para manter as informações atualizadas e precisas, não garantimos que estejam livres de erros
+• As dosagens podem variar conforme protocolos institucionais e condições específicas do paciente
+
+5. ATUALIZAÇÕES
+Reservamo-nos o direito de atualizar estes termos a qualquer momento. O uso continuado do aplicativo após alterações constitui aceitação dos novos termos.
+''',
+            ),
+            const SizedBox(height: 16),
+            _buildSectionCard(
+              context,
+              title: 'Política de Privacidade',
+              icon: Icons.privacy_tip_outlined,
+              content: '''
+1. COLETA DE DADOS
+• Este aplicativo NÃO coleta dados pessoais
+• Nenhuma informação é enviada para servidores externos
+• Todos os dados são armazenados localmente no dispositivo
+
+2. ARMAZENAMENTO LOCAL
+• Os valores inseridos nas calculadoras são armazenados apenas localmente para conveniência do usuário
+• Você pode limpar esses dados a qualquer momento através do próprio aplicativo
+
+3. COMPARTILHAMENTO
+• Não compartilhamos nenhuma informação com terceiros
+• Não utilizamos serviços de análise ou rastreamento
+
+4. SEGURANÇA
+• Os dados permanecem exclusivamente em seu dispositivo
+• Recomendamos manter seu dispositivo protegido com senha/biometria
+
+5. CONTATO
+Para dúvidas sobre privacidade, entre em contato através da página do aplicativo na loja.
+''',
+            ),
+            const SizedBox(height: 16),
+            _buildSectionCard(
+              context,
+              title: 'Aviso Legal',
+              icon: Icons.gavel_outlined,
+              content: '''
+IMPORTANTE - LEIA COM ATENÇÃO:
+
+Este aplicativo é fornecido "como está", sem garantias de qualquer tipo, expressas ou implícitas.
+
+O AXYN é uma ferramenta de APOIO e CONSULTA RÁPIDA. Não deve ser utilizado como única fonte de informação para decisões clínicas.
+
+RESPONSABILIDADES DO USUÁRIO:
+• Verificar todas as dosagens com bulas e protocolos oficiais
+• Considerar as condições individuais de cada paciente
+• Consultar especialistas quando necessário
+• Manter-se atualizado com as diretrizes vigentes
+
+O desenvolvedor não assume responsabilidade por:
+• Erros de interpretação das informações
+• Uso inadequado do aplicativo
+• Danos diretos ou indiretos resultantes do uso
+• Decisões clínicas tomadas com base no aplicativo
+
+Ao usar este aplicativo, você reconhece que leu, entendeu e concorda com todos os termos acima.
+''',
+            ),
+            const SizedBox(height: 16),
+            _buildSectionCard(
+              context,
+              title: 'Referências',
+              icon: Icons.menu_book_outlined,
+              content: '''
+As fórmulas e dosagens utilizadas neste aplicativo são baseadas em:
+
+• Diretrizes da Sociedade Brasileira de Pediatria (SBP)
+• Protocolos do Ministério da Saúde
+• Literatura médica estabelecida
+• Consensos de especialidades médicas
+
+As doses pediátricas seguem as recomendações padronizadas para uso ambulatorial, devendo ser ajustadas conforme necessidade clínica individual.
+
+Última atualização das referências: Janeiro 2026
+''',
+            ),
+            const SizedBox(height: 24),
+            // Developer Info
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.code,
+                    size: 32,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Desenvolvido com ❤️ para profissionais de saúde',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.grey.shade600,
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '© 2026 AXYN. Todos os direitos reservados.',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.grey.shade500,
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionCard(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required String content,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              color: Theme.of(context).colorScheme.primary,
+              size: 20,
+            ),
+          ),
+          title: Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  Text(
+                    content.trim(),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          height: 1.6,
+                          color: Colors.grey.shade700,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
