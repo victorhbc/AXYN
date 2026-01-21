@@ -56,62 +56,13 @@ class MainApp extends StatelessWidget {
   }
 }
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
-
-  final List<Widget> _pages = const [
-    HomeSection(),
-    Center(child: Text('Buscar')),
-    Center(child: Text('Favoritos')),
-    Center(child: Text('Perfil')),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Início',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search_outlined),
-            activeIcon: Icon(Icons.search),
-            label: 'Buscar',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_outline),
-            activeIcon: Icon(Icons.favorite),
-            label: 'Favoritos',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Perfil',
-          ),
-        ],
-      ),
+    return const Scaffold(
+      body: HomeSection(),
     );
   }
 }
@@ -161,14 +112,70 @@ class _HomeSectionState extends State<HomeSection> {
       storeKey: 'creatinine_clearance',
       resultUnit: 'mL/min',
     ),
-    const HomeItem(title: 'Item 3', subtitle: 'Em breve', icon: Icons.widgets_outlined),
-    const HomeItem(title: 'Item 4', subtitle: 'Em breve', icon: Icons.widgets_outlined),
-    const HomeItem(title: 'Item 5', subtitle: 'Em breve', icon: Icons.widgets_outlined),
-    const HomeItem(title: 'Item 6', subtitle: 'Em breve', icon: Icons.widgets_outlined),
-    const HomeItem(title: 'Item 7', subtitle: 'Em breve', icon: Icons.widgets_outlined),
-    const HomeItem(title: 'Item 8', subtitle: 'Em breve', icon: Icons.widgets_outlined),
-    const HomeItem(title: 'Item 9', subtitle: 'Em breve', icon: Icons.widgets_outlined),
-    const HomeItem(title: 'Item 10', subtitle: 'Em breve', icon: Icons.widgets_outlined),
+    const HomeItem(
+      title: 'Dose por Peso',
+      subtitle: 'Cálculo de Medicamentos',
+      icon: Icons.medication_outlined,
+      page: DosePorPesoScreen(),
+      storeKey: 'dose_peso',
+      resultUnit: '',
+    ),
+    const HomeItem(
+      title: 'Glasgow',
+      subtitle: 'Escala de Coma',
+      icon: Icons.psychology_outlined,
+      page: GlasgowScreen(),
+      storeKey: 'glasgow',
+      resultUnit: 'pts',
+    ),
+    const HomeItem(
+      title: 'CHA₂DS₂-VASc',
+      subtitle: 'Risco de AVC',
+      icon: Icons.favorite_outlined,
+      page: Cha2ds2VascScreen(),
+      storeKey: 'cha2ds2vasc',
+      resultUnit: 'pts',
+    ),
+    const HomeItem(
+      title: 'HAS-BLED',
+      subtitle: 'Risco de Sangramento',
+      icon: Icons.bloodtype_outlined,
+      page: HasBledScreen(),
+      storeKey: 'hasbled',
+      resultUnit: 'pts',
+    ),
+    const HomeItem(
+      title: 'Wells TEP',
+      subtitle: 'Embolia Pulmonar',
+      icon: Icons.air_outlined,
+      page: WellsTepScreen(),
+      storeKey: 'wells_tep',
+      resultUnit: 'pts',
+    ),
+    const HomeItem(
+      title: 'Correção Na⁺',
+      subtitle: 'Sódio Corrigido',
+      icon: Icons.science_outlined,
+      page: SodiumCorrectionScreen(),
+      storeKey: 'sodium_correction',
+      resultUnit: 'mEq/L',
+    ),
+    const HomeItem(
+      title: 'Osmolaridade',
+      subtitle: 'Osmolaridade Plasmática',
+      icon: Icons.opacity_outlined,
+      page: OsmolarityScreen(),
+      storeKey: 'osmolarity',
+      resultUnit: 'mOsm/L',
+    ),
+    const HomeItem(
+      title: 'Idade Gestacional',
+      subtitle: 'IG e DPP',
+      icon: Icons.pregnant_woman_outlined,
+      page: GestationalAgeScreen(),
+      storeKey: 'gestational_age',
+      resultUnit: '',
+    ),
   ];
 
   @override
@@ -357,8 +364,51 @@ class _GridItem extends StatelessWidget {
         return Colors.red;
       case 'Falência Renal (G5)':
         return Colors.red.shade900;
+      // Glasgow classifications
+      case 'TCE Leve':
+        return Colors.green;
+      case 'TCE Moderado':
+        return Colors.orange;
+      case 'TCE Grave':
+        return Colors.red;
+      // CHA2DS2-VASc classifications
+      case 'Baixo risco':
+        return Colors.green;
+      case 'Risco moderado':
+        return Colors.orange;
+      case 'Alto risco':
+        return Colors.red;
+      // HAS-BLED classifications
+      case 'Baixo risco sangramento':
+        return Colors.green;
+      case 'Risco moderado sangramento':
+        return Colors.orange;
+      case 'Alto risco sangramento':
+        return Colors.red;
+      // Wells TEP classifications
+      case 'Baixa probabilidade':
+        return Colors.green;
+      case 'Probabilidade moderada':
+        return Colors.orange;
+      case 'Alta probabilidade':
+        return Colors.red;
+      // Sodium/Osmolarity - general
+      case 'Normal':
+        return Colors.green;
+      case 'Hiponatremia':
+      case 'Hipo-osmolar':
+        return Colors.orange;
+      case 'Hipernatremia':
+      case 'Hiperosmolar':
+        return Colors.red;
+      // Dose calculation
+      case 'Calculado':
+        return Colors.blue;
+      // Gestational age
+      case 'Idade Gestacional':
+        return Colors.purple;
       default:
-        return Colors.grey;
+        return Colors.blue;
     }
   }
 
@@ -1099,6 +1149,981 @@ class _CreatinineClearanceScreenState extends State<CreatinineClearanceScreen> {
               textAlign: TextAlign.end,
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+// ==================== DOSE POR PESO ====================
+class DosePorPesoScreen extends StatefulWidget {
+  const DosePorPesoScreen({super.key});
+
+  @override
+  State<DosePorPesoScreen> createState() => _DosePorPesoScreenState();
+}
+
+class _DosePorPesoScreenState extends State<DosePorPesoScreen> {
+  final _pesoController = TextEditingController();
+  final _doseController = TextEditingController();
+  double? _resultado;
+
+  void _calcular() {
+    final peso = double.tryParse(_pesoController.text.replaceAll(',', '.'));
+    final doseMgKg = double.tryParse(_doseController.text.replaceAll(',', '.'));
+
+    if (peso == null || doseMgKg == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, insira valores válidos'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    final resultado = peso * doseMgKg;
+    setState(() => _resultado = resultado);
+    CalculationStore().setResult('dose_peso', resultado, classification: 'Calculado');
+  }
+
+  void _limpar() {
+    setState(() {
+      _pesoController.clear();
+      _doseController.clear();
+      _resultado = null;
+    });
+  }
+
+  @override
+  void dispose() {
+    _pesoController.dispose();
+    _doseController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Dose por Peso'), centerTitle: true),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Icon(Icons.medication_outlined, size: 80, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(height: 24),
+            Text('Cálculo de Dose', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+            const SizedBox(height: 32),
+            TextField(
+              controller: _pesoController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                labelText: 'Peso (kg)',
+                hintText: 'Ex: 70',
+                prefixIcon: const Icon(Icons.fitness_center),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                filled: true,
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _doseController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                labelText: 'Dose (mg/kg)',
+                hintText: 'Ex: 10',
+                prefixIcon: const Icon(Icons.science_outlined),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                filled: true,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: _calcular,
+                    icon: const Icon(Icons.calculate),
+                    label: const Text('Calcular'),
+                    style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                OutlinedButton.icon(onPressed: _limpar, icon: const Icon(Icons.refresh), label: const Text('Limpar')),
+              ],
+            ),
+            if (_resultado != null) ...[
+              const SizedBox(height: 32),
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.blue, width: 2),
+                ),
+                child: Column(
+                  children: [
+                    Text('Dose Total', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.grey)),
+                    const SizedBox(height: 8),
+                    Text('${_resultado!.toStringAsFixed(1)} mg', style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold, color: Colors.blue)),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ==================== GLASGOW ====================
+class GlasgowScreen extends StatefulWidget {
+  const GlasgowScreen({super.key});
+
+  @override
+  State<GlasgowScreen> createState() => _GlasgowScreenState();
+}
+
+class _GlasgowScreenState extends State<GlasgowScreen> {
+  int _ocular = 0;
+  int _verbal = 0;
+  int _motor = 0;
+
+  int get _total => _ocular + _verbal + _motor;
+
+  String _getClassificacao(int score) {
+    if (score >= 13) return 'TCE Leve';
+    if (score >= 9) return 'TCE Moderado';
+    return 'TCE Grave';
+  }
+
+  Color _getColor(int score) {
+    if (score >= 13) return Colors.green;
+    if (score >= 9) return Colors.orange;
+    return Colors.red;
+  }
+
+  void _salvar() {
+    if (_total > 0) {
+      CalculationStore().setResult('glasgow', _total.toDouble(), classification: _getClassificacao(_total));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Resultado salvo'), duration: Duration(seconds: 1)),
+      );
+    }
+  }
+
+  void _limpar() {
+    setState(() {
+      _ocular = 0;
+      _verbal = 0;
+      _motor = 0;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _getColor(_total);
+    return Scaffold(
+      appBar: AppBar(title: const Text('Escala de Glasgow'), centerTitle: true),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (_total > 0)
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: color, width: 2),
+                ),
+                child: Column(
+                  children: [
+                    Text('$_total', style: Theme.of(context).textTheme.displayLarge?.copyWith(fontWeight: FontWeight.bold, color: color)),
+                    Text(_getClassificacao(_total), style: Theme.of(context).textTheme.titleMedium?.copyWith(color: color, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 24),
+            _buildSection('Abertura Ocular', [
+              _buildOption('Espontânea', 4, _ocular, (v) => setState(() => _ocular = v)),
+              _buildOption('Ao estímulo verbal', 3, _ocular, (v) => setState(() => _ocular = v)),
+              _buildOption('Ao estímulo doloroso', 2, _ocular, (v) => setState(() => _ocular = v)),
+              _buildOption('Ausente', 1, _ocular, (v) => setState(() => _ocular = v)),
+            ]),
+            const SizedBox(height: 16),
+            _buildSection('Resposta Verbal', [
+              _buildOption('Orientada', 5, _verbal, (v) => setState(() => _verbal = v)),
+              _buildOption('Confusa', 4, _verbal, (v) => setState(() => _verbal = v)),
+              _buildOption('Palavras inapropriadas', 3, _verbal, (v) => setState(() => _verbal = v)),
+              _buildOption('Sons incompreensíveis', 2, _verbal, (v) => setState(() => _verbal = v)),
+              _buildOption('Ausente', 1, _verbal, (v) => setState(() => _verbal = v)),
+            ]),
+            const SizedBox(height: 16),
+            _buildSection('Resposta Motora', [
+              _buildOption('Obedece comandos', 6, _motor, (v) => setState(() => _motor = v)),
+              _buildOption('Localiza dor', 5, _motor, (v) => setState(() => _motor = v)),
+              _buildOption('Movimento de retirada', 4, _motor, (v) => setState(() => _motor = v)),
+              _buildOption('Flexão anormal', 3, _motor, (v) => setState(() => _motor = v)),
+              _buildOption('Extensão anormal', 2, _motor, (v) => setState(() => _motor = v)),
+              _buildOption('Ausente', 1, _motor, (v) => setState(() => _motor = v)),
+            ]),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(child: FilledButton.icon(onPressed: _total > 0 ? _salvar : null, icon: const Icon(Icons.save), label: const Text('Salvar'))),
+                const SizedBox(width: 12),
+                OutlinedButton.icon(onPressed: _limpar, icon: const Icon(Icons.refresh), label: const Text('Limpar')),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSection(String title, List<Widget> options) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
+            ),
+            child: Text(title, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+          ),
+          ...options,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOption(String label, int value, int groupValue, ValueChanged<int> onChanged) {
+    return RadioListTile<int>(
+      title: Text(label),
+      secondary: Text('$value', style: const TextStyle(fontWeight: FontWeight.bold)),
+      value: value,
+      groupValue: groupValue,
+      onChanged: (v) => onChanged(v!),
+      dense: true,
+    );
+  }
+}
+
+// ==================== CHA2DS2-VASc ====================
+class Cha2ds2VascScreen extends StatefulWidget {
+  const Cha2ds2VascScreen({super.key});
+
+  @override
+  State<Cha2ds2VascScreen> createState() => _Cha2ds2VascScreenState();
+}
+
+class _Cha2ds2VascScreenState extends State<Cha2ds2VascScreen> {
+  bool _chf = false;
+  bool _hypertension = false;
+  bool _age75 = false;
+  bool _diabetes = false;
+  bool _stroke = false;
+  bool _vascular = false;
+  bool _age65 = false;
+  bool _female = false;
+
+  int get _score {
+    int s = 0;
+    if (_chf) s += 1;
+    if (_hypertension) s += 1;
+    if (_age75) s += 2;
+    if (_diabetes) s += 1;
+    if (_stroke) s += 2;
+    if (_vascular) s += 1;
+    if (_age65) s += 1;
+    if (_female) s += 1;
+    return s;
+  }
+
+  String _getClassificacao(int score) {
+    if (score == 0) return 'Baixo risco';
+    if (score == 1) return 'Risco moderado';
+    return 'Alto risco';
+  }
+
+  Color _getColor(int score) {
+    if (score == 0) return Colors.green;
+    if (score == 1) return Colors.orange;
+    return Colors.red;
+  }
+
+  String _getRecomendacao(int score) {
+    if (score == 0) return 'Anticoagulação não recomendada';
+    if (score == 1) return 'Considerar anticoagulação';
+    return 'Anticoagulação recomendada';
+  }
+
+  void _salvar() {
+    CalculationStore().setResult('cha2ds2vasc', _score.toDouble(), classification: _getClassificacao(_score));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Resultado salvo'), duration: Duration(seconds: 1)));
+  }
+
+  void _limpar() {
+    setState(() {
+      _chf = _hypertension = _age75 = _diabetes = _stroke = _vascular = _age65 = _female = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _getColor(_score);
+    return Scaffold(
+      appBar: AppBar(title: const Text('CHA₂DS₂-VASc'), centerTitle: true),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(16), border: Border.all(color: color, width: 2)),
+              child: Column(
+                children: [
+                  Text('$_score', style: Theme.of(context).textTheme.displayLarge?.copyWith(fontWeight: FontWeight.bold, color: color)),
+                  Text(_getClassificacao(_score), style: Theme.of(context).textTheme.titleMedium?.copyWith(color: color, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  Text(_getRecomendacao(_score), style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey), textAlign: TextAlign.center),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            _buildCheckItem('C - Insuficiência cardíaca', '+1', _chf, (v) => setState(() => _chf = v!)),
+            _buildCheckItem('H - Hipertensão', '+1', _hypertension, (v) => setState(() => _hypertension = v!)),
+            _buildCheckItem('A₂ - Idade ≥ 75 anos', '+2', _age75, (v) => setState(() => _age75 = v!)),
+            _buildCheckItem('D - Diabetes mellitus', '+1', _diabetes, (v) => setState(() => _diabetes = v!)),
+            _buildCheckItem('S₂ - AVC/AIT/Tromboembolismo', '+2', _stroke, (v) => setState(() => _stroke = v!)),
+            _buildCheckItem('V - Doença vascular', '+1', _vascular, (v) => setState(() => _vascular = v!)),
+            _buildCheckItem('A - Idade 65-74 anos', '+1', _age65, (v) => setState(() => _age65 = v!)),
+            _buildCheckItem('Sc - Sexo feminino', '+1', _female, (v) => setState(() => _female = v!)),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(child: FilledButton.icon(onPressed: _salvar, icon: const Icon(Icons.save), label: const Text('Salvar'))),
+                const SizedBox(width: 12),
+                OutlinedButton.icon(onPressed: _limpar, icon: const Icon(Icons.refresh), label: const Text('Limpar')),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCheckItem(String label, String points, bool value, ValueChanged<bool?> onChanged) {
+    return CheckboxListTile(title: Text(label), secondary: Text(points, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)), value: value, onChanged: onChanged);
+  }
+}
+
+// ==================== HAS-BLED ====================
+class HasBledScreen extends StatefulWidget {
+  const HasBledScreen({super.key});
+
+  @override
+  State<HasBledScreen> createState() => _HasBledScreenState();
+}
+
+class _HasBledScreenState extends State<HasBledScreen> {
+  bool _hypertension = false;
+  bool _renal = false;
+  bool _liver = false;
+  bool _stroke = false;
+  bool _bleeding = false;
+  bool _labile = false;
+  bool _age = false;
+  bool _drugs = false;
+  bool _alcohol = false;
+
+  int get _score {
+    int s = 0;
+    if (_hypertension) s++;
+    if (_renal) s++;
+    if (_liver) s++;
+    if (_stroke) s++;
+    if (_bleeding) s++;
+    if (_labile) s++;
+    if (_age) s++;
+    if (_drugs) s++;
+    if (_alcohol) s++;
+    return s;
+  }
+
+  String _getClassificacao(int score) {
+    if (score <= 1) return 'Baixo risco sangramento';
+    if (score == 2) return 'Risco moderado sangramento';
+    return 'Alto risco sangramento';
+  }
+
+  Color _getColor(int score) {
+    if (score <= 1) return Colors.green;
+    if (score == 2) return Colors.orange;
+    return Colors.red;
+  }
+
+  void _salvar() {
+    CalculationStore().setResult('hasbled', _score.toDouble(), classification: _getClassificacao(_score));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Resultado salvo'), duration: Duration(seconds: 1)));
+  }
+
+  void _limpar() {
+    setState(() {
+      _hypertension = _renal = _liver = _stroke = _bleeding = _labile = _age = _drugs = _alcohol = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _getColor(_score);
+    return Scaffold(
+      appBar: AppBar(title: const Text('HAS-BLED'), centerTitle: true),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(16), border: Border.all(color: color, width: 2)),
+              child: Column(
+                children: [
+                  Text('$_score', style: Theme.of(context).textTheme.displayLarge?.copyWith(fontWeight: FontWeight.bold, color: color)),
+                  Text(_getClassificacao(_score), style: Theme.of(context).textTheme.titleMedium?.copyWith(color: color, fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            _buildCheckItem('H - Hipertensão (PAS > 160)', _hypertension, (v) => setState(() => _hypertension = v!)),
+            _buildCheckItem('A - Função renal anormal', _renal, (v) => setState(() => _renal = v!)),
+            _buildCheckItem('A - Função hepática anormal', _liver, (v) => setState(() => _liver = v!)),
+            _buildCheckItem('S - AVC prévio', _stroke, (v) => setState(() => _stroke = v!)),
+            _buildCheckItem('B - Sangramento prévio', _bleeding, (v) => setState(() => _bleeding = v!)),
+            _buildCheckItem('L - INR lábil', _labile, (v) => setState(() => _labile = v!)),
+            _buildCheckItem('E - Idade > 65 anos', _age, (v) => setState(() => _age = v!)),
+            _buildCheckItem('D - Uso de drogas (AINEs/antiplaq.)', _drugs, (v) => setState(() => _drugs = v!)),
+            _buildCheckItem('D - Uso de álcool', _alcohol, (v) => setState(() => _alcohol = v!)),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(child: FilledButton.icon(onPressed: _salvar, icon: const Icon(Icons.save), label: const Text('Salvar'))),
+                const SizedBox(width: 12),
+                OutlinedButton.icon(onPressed: _limpar, icon: const Icon(Icons.refresh), label: const Text('Limpar')),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCheckItem(String label, bool value, ValueChanged<bool?> onChanged) {
+    return CheckboxListTile(title: Text(label), value: value, onChanged: onChanged);
+  }
+}
+
+// ==================== WELLS TEP ====================
+class WellsTepScreen extends StatefulWidget {
+  const WellsTepScreen({super.key});
+
+  @override
+  State<WellsTepScreen> createState() => _WellsTepScreenState();
+}
+
+class _WellsTepScreenState extends State<WellsTepScreen> {
+  bool _dvtSymptoms = false;
+  bool _noAlternative = false;
+  bool _hr100 = false;
+  bool _immobilization = false;
+  bool _previousDvtPe = false;
+  bool _hemoptysis = false;
+  bool _malignancy = false;
+
+  double get _score {
+    double s = 0;
+    if (_dvtSymptoms) s += 3;
+    if (_noAlternative) s += 3;
+    if (_hr100) s += 1.5;
+    if (_immobilization) s += 1.5;
+    if (_previousDvtPe) s += 1.5;
+    if (_hemoptysis) s += 1;
+    if (_malignancy) s += 1;
+    return s;
+  }
+
+  String _getClassificacao(double score) {
+    if (score <= 1) return 'Baixa probabilidade';
+    if (score <= 6) return 'Probabilidade moderada';
+    return 'Alta probabilidade';
+  }
+
+  Color _getColor(double score) {
+    if (score <= 1) return Colors.green;
+    if (score <= 6) return Colors.orange;
+    return Colors.red;
+  }
+
+  String _getProbabilidade(double score) {
+    if (score <= 1) return '~1.3% chance de TEP';
+    if (score <= 6) return '~16.2% chance de TEP';
+    return '~37.5% chance de TEP';
+  }
+
+  void _salvar() {
+    CalculationStore().setResult('wells_tep', _score, classification: _getClassificacao(_score));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Resultado salvo'), duration: Duration(seconds: 1)));
+  }
+
+  void _limpar() {
+    setState(() {
+      _dvtSymptoms = _noAlternative = _hr100 = _immobilization = _previousDvtPe = _hemoptysis = _malignancy = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _getColor(_score);
+    return Scaffold(
+      appBar: AppBar(title: const Text('Wells - TEP'), centerTitle: true),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(16), border: Border.all(color: color, width: 2)),
+              child: Column(
+                children: [
+                  Text(_score.toStringAsFixed(1), style: Theme.of(context).textTheme.displayLarge?.copyWith(fontWeight: FontWeight.bold, color: color)),
+                  Text(_getClassificacao(_score), style: Theme.of(context).textTheme.titleMedium?.copyWith(color: color, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  Text(_getProbabilidade(_score), style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            _buildCheckItem('Sinais/sintomas clínicos de TVP', '+3', _dvtSymptoms, (v) => setState(() => _dvtSymptoms = v!)),
+            _buildCheckItem('TEP é o diagnóstico mais provável', '+3', _noAlternative, (v) => setState(() => _noAlternative = v!)),
+            _buildCheckItem('FC > 100 bpm', '+1.5', _hr100, (v) => setState(() => _hr100 = v!)),
+            _buildCheckItem('Imobilização/cirurgia nas últimas 4 sem', '+1.5', _immobilization, (v) => setState(() => _immobilization = v!)),
+            _buildCheckItem('TVP/TEP prévios', '+1.5', _previousDvtPe, (v) => setState(() => _previousDvtPe = v!)),
+            _buildCheckItem('Hemoptise', '+1', _hemoptysis, (v) => setState(() => _hemoptysis = v!)),
+            _buildCheckItem('Malignidade', '+1', _malignancy, (v) => setState(() => _malignancy = v!)),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(child: FilledButton.icon(onPressed: _salvar, icon: const Icon(Icons.save), label: const Text('Salvar'))),
+                const SizedBox(width: 12),
+                OutlinedButton.icon(onPressed: _limpar, icon: const Icon(Icons.refresh), label: const Text('Limpar')),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCheckItem(String label, String points, bool value, ValueChanged<bool?> onChanged) {
+    return CheckboxListTile(title: Text(label), secondary: Text(points, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)), value: value, onChanged: onChanged);
+  }
+}
+
+// ==================== CORREÇÃO DE SÓDIO ====================
+class SodiumCorrectionScreen extends StatefulWidget {
+  const SodiumCorrectionScreen({super.key});
+
+  @override
+  State<SodiumCorrectionScreen> createState() => _SodiumCorrectionScreenState();
+}
+
+class _SodiumCorrectionScreenState extends State<SodiumCorrectionScreen> {
+  final _sodiumController = TextEditingController();
+  final _glucoseController = TextEditingController();
+  double? _correctedSodium;
+
+  void _calcular() {
+    final sodium = double.tryParse(_sodiumController.text.replaceAll(',', '.'));
+    final glucose = double.tryParse(_glucoseController.text.replaceAll(',', '.'));
+
+    if (sodium == null || glucose == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Por favor, insira valores válidos'), backgroundColor: Colors.red));
+      return;
+    }
+
+    // Fórmula: Na corrigido = Na medido + 1.6 × ((Glicose - 100) / 100)
+    final corrected = sodium + 1.6 * ((glucose - 100) / 100);
+    final classification = corrected < 135 ? 'Hiponatremia' : (corrected > 145 ? 'Hipernatremia' : 'Normal');
+
+    setState(() => _correctedSodium = corrected);
+    CalculationStore().setResult('sodium_correction', corrected, classification: classification);
+  }
+
+  void _limpar() {
+    setState(() {
+      _sodiumController.clear();
+      _glucoseController.clear();
+      _correctedSodium = null;
+    });
+  }
+
+  Color _getColor(double sodium) {
+    if (sodium < 135) return Colors.orange;
+    if (sodium > 145) return Colors.red;
+    return Colors.green;
+  }
+
+  @override
+  void dispose() {
+    _sodiumController.dispose();
+    _glucoseController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Correção de Sódio'), centerTitle: true),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Icon(Icons.science_outlined, size: 80, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(height: 24),
+            Text('Sódio Corrigido pela Glicemia', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+            const SizedBox(height: 8),
+            Text('Na⁺ corr = Na⁺ + 1.6 × ((Glic - 100) / 100)', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey), textAlign: TextAlign.center),
+            const SizedBox(height: 32),
+            TextField(
+              controller: _sodiumController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(labelText: 'Sódio medido (mEq/L)', hintText: 'Ex: 130', prefixIcon: const Icon(Icons.water_drop_outlined), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)), filled: true),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _glucoseController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(labelText: 'Glicemia (mg/dL)', hintText: 'Ex: 400', prefixIcon: const Icon(Icons.bloodtype_outlined), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)), filled: true),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(child: FilledButton.icon(onPressed: _calcular, icon: const Icon(Icons.calculate), label: const Text('Calcular'))),
+                const SizedBox(width: 12),
+                OutlinedButton.icon(onPressed: _limpar, icon: const Icon(Icons.refresh), label: const Text('Limpar')),
+              ],
+            ),
+            if (_correctedSodium != null) ...[
+              const SizedBox(height: 32),
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(color: _getColor(_correctedSodium!).withOpacity(0.1), borderRadius: BorderRadius.circular(16), border: Border.all(color: _getColor(_correctedSodium!), width: 2)),
+                child: Column(
+                  children: [
+                    Text('Sódio Corrigido', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.grey)),
+                    const SizedBox(height: 8),
+                    Text('${_correctedSodium!.toStringAsFixed(1)} mEq/L', style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold, color: _getColor(_correctedSodium!))),
+                    const SizedBox(height: 8),
+                    Text(_correctedSodium! < 135 ? 'Hiponatremia' : (_correctedSodium! > 145 ? 'Hipernatremia' : 'Normal'), style: Theme.of(context).textTheme.titleMedium?.copyWith(color: _getColor(_correctedSodium!), fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ==================== OSMOLARIDADE PLASMÁTICA ====================
+class OsmolarityScreen extends StatefulWidget {
+  const OsmolarityScreen({super.key});
+
+  @override
+  State<OsmolarityScreen> createState() => _OsmolarityScreenState();
+}
+
+class _OsmolarityScreenState extends State<OsmolarityScreen> {
+  final _sodiumController = TextEditingController();
+  final _glucoseController = TextEditingController();
+  final _ureaController = TextEditingController();
+  double? _osmolarity;
+
+  void _calcular() {
+    final sodium = double.tryParse(_sodiumController.text.replaceAll(',', '.'));
+    final glucose = double.tryParse(_glucoseController.text.replaceAll(',', '.'));
+    final urea = double.tryParse(_ureaController.text.replaceAll(',', '.'));
+
+    if (sodium == null || glucose == null || urea == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Por favor, insira valores válidos'), backgroundColor: Colors.red));
+      return;
+    }
+
+    // Fórmula: Osm = 2×Na + (Glicose/18) + (Ureia/6)
+    final osm = (2 * sodium) + (glucose / 18) + (urea / 6);
+    final classification = osm < 280 ? 'Hipo-osmolar' : (osm > 295 ? 'Hiperosmolar' : 'Normal');
+
+    setState(() => _osmolarity = osm);
+    CalculationStore().setResult('osmolarity', osm, classification: classification);
+  }
+
+  void _limpar() {
+    setState(() {
+      _sodiumController.clear();
+      _glucoseController.clear();
+      _ureaController.clear();
+      _osmolarity = null;
+    });
+  }
+
+  Color _getColor(double osm) {
+    if (osm < 280) return Colors.orange;
+    if (osm > 295) return Colors.red;
+    return Colors.green;
+  }
+
+  @override
+  void dispose() {
+    _sodiumController.dispose();
+    _glucoseController.dispose();
+    _ureaController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Osmolaridade Plasmática'), centerTitle: true),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Icon(Icons.opacity_outlined, size: 80, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(height: 24),
+            Text('Osmolaridade Calculada', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+            const SizedBox(height: 8),
+            Text('Osm = 2×Na + (Glic/18) + (Ureia/6)', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey), textAlign: TextAlign.center),
+            const SizedBox(height: 32),
+            TextField(
+              controller: _sodiumController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(labelText: 'Sódio (mEq/L)', hintText: 'Ex: 140', prefixIcon: const Icon(Icons.water_drop_outlined), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)), filled: true),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _glucoseController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(labelText: 'Glicemia (mg/dL)', hintText: 'Ex: 100', prefixIcon: const Icon(Icons.bloodtype_outlined), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)), filled: true),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _ureaController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(labelText: 'Ureia (mg/dL)', hintText: 'Ex: 40', prefixIcon: const Icon(Icons.science_outlined), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)), filled: true),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(child: FilledButton.icon(onPressed: _calcular, icon: const Icon(Icons.calculate), label: const Text('Calcular'))),
+                const SizedBox(width: 12),
+                OutlinedButton.icon(onPressed: _limpar, icon: const Icon(Icons.refresh), label: const Text('Limpar')),
+              ],
+            ),
+            if (_osmolarity != null) ...[
+              const SizedBox(height: 32),
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(color: _getColor(_osmolarity!).withOpacity(0.1), borderRadius: BorderRadius.circular(16), border: Border.all(color: _getColor(_osmolarity!), width: 2)),
+                child: Column(
+                  children: [
+                    Text('Osmolaridade', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.grey)),
+                    const SizedBox(height: 8),
+                    Text('${_osmolarity!.toStringAsFixed(1)} mOsm/L', style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold, color: _getColor(_osmolarity!))),
+                    const SizedBox(height: 8),
+                    Text(_osmolarity! < 280 ? 'Hipo-osmolar' : (_osmolarity! > 295 ? 'Hiperosmolar' : 'Normal'), style: Theme.of(context).textTheme.titleMedium?.copyWith(color: _getColor(_osmolarity!), fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 8),
+                    Text('Normal: 280-295 mOsm/L', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ==================== IDADE GESTACIONAL / DPP ====================
+class GestationalAgeScreen extends StatefulWidget {
+  const GestationalAgeScreen({super.key});
+
+  @override
+  State<GestationalAgeScreen> createState() => _GestationalAgeScreenState();
+}
+
+class _GestationalAgeScreenState extends State<GestationalAgeScreen> {
+  DateTime? _dum;
+  int? _semanas;
+  int? _dias;
+  DateTime? _dpp;
+
+  void _selectDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().subtract(const Duration(days: 60)),
+      firstDate: DateTime.now().subtract(const Duration(days: 300)),
+      lastDate: DateTime.now(),
+      helpText: 'Selecione a DUM',
+    );
+    if (picked != null) {
+      _calcular(picked);
+    }
+  }
+
+  void _calcular(DateTime dum) {
+    final now = DateTime.now();
+    final diff = now.difference(dum).inDays;
+    final semanas = diff ~/ 7;
+    final dias = diff % 7;
+    final dpp = dum.add(const Duration(days: 280)); // 40 semanas
+
+    setState(() {
+      _dum = dum;
+      _semanas = semanas;
+      _dias = dias;
+      _dpp = dpp;
+    });
+
+    CalculationStore().setResult('gestational_age', semanas.toDouble(), classification: 'Idade Gestacional');
+  }
+
+  void _limpar() {
+    setState(() {
+      _dum = null;
+      _semanas = null;
+      _dias = null;
+      _dpp = null;
+    });
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+  }
+
+  String _getTrimestre(int semanas) {
+    if (semanas < 14) return '1º Trimestre';
+    if (semanas < 28) return '2º Trimestre';
+    return '3º Trimestre';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Idade Gestacional'), centerTitle: true),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Icon(Icons.pregnant_woman_outlined, size: 80, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(height: 24),
+            Text('Calculadora Obstétrica', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+            const SizedBox(height: 32),
+            FilledButton.icon(
+              onPressed: _selectDate,
+              icon: const Icon(Icons.calendar_today),
+              label: Text(_dum != null ? 'DUM: ${_formatDate(_dum!)}' : 'Selecionar DUM'),
+              style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+            ),
+            if (_dum != null) ...[
+              const SizedBox(height: 12),
+              OutlinedButton.icon(onPressed: _limpar, icon: const Icon(Icons.refresh), label: const Text('Limpar')),
+            ],
+            if (_semanas != null && _dpp != null) ...[
+              const SizedBox(height: 32),
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(color: Colors.purple.withOpacity(0.1), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.purple, width: 2)),
+                child: Column(
+                  children: [
+                    Text('Idade Gestacional', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.grey)),
+                    const SizedBox(height: 8),
+                    Text('$_semanas sem + $_dias dias', style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold, color: Colors.purple)),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(color: Colors.purple.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
+                      child: Text(_getTrimestre(_semanas!), style: const TextStyle(color: Colors.purple, fontWeight: FontWeight.w600)),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(color: Colors.pink.withOpacity(0.1), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.pink, width: 2)),
+                child: Column(
+                  children: [
+                    Text('Data Provável do Parto', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.grey)),
+                    const SizedBox(height: 8),
+                    Text(_formatDate(_dpp!), style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold, color: Colors.pink)),
+                    const SizedBox(height: 8),
+                    Text('(40 semanas)', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              _buildInfoTable(),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoTable() {
+    if (_semanas == null) return const SizedBox.shrink();
+    return Container(
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest, borderRadius: const BorderRadius.vertical(top: Radius.circular(11))),
+            child: Text('Informações', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+          ),
+          _buildInfoRow('DUM', _formatDate(_dum!)),
+          _buildInfoRow('Dias de gestação', '${_semanas! * 7 + _dias!} dias'),
+          _buildInfoRow('Semanas completas', '$_semanas semanas'),
+          _buildInfoRow('Trimestre', _getTrimestre(_semanas!), isLast: true),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value, {bool isLast = false}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(border: isLast ? null : Border(bottom: BorderSide(color: Colors.grey.shade300))),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey)),
+          Text(value, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
         ],
       ),
     );
