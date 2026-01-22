@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_strings.dart';
-import '../../shared/shared.dart';
 import 'data/legal_content.dart';
 import 'widgets/app_info_card.dart';
 import 'widgets/expandable_section_card.dart';
@@ -13,12 +12,11 @@ class SobreSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: ResponsiveContent(
-          maxWidth: 700,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 700),
+          child: ListView(
+            padding: const EdgeInsets.all(16.0),
             children: [
               _buildTitle(context),
               const SizedBox(height: 24),
