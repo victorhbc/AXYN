@@ -1,7 +1,7 @@
 /// Legal content for the About section
 abstract class LegalContent {
   static const String termsOfUse = '''
-Ao utilizar o aplicativo AXYN, você concorda com os seguintes termos:
+Ao utilizar o aplicativo axys, você concorda com os seguintes termos:
 
 1. FINALIDADE DO APLICATIVO
 Este aplicativo é uma ferramenta de apoio e referência para profissionais de saúde. Os cálculos e dosagens apresentados são baseados em diretrizes e literatura médica estabelecidas.
@@ -52,7 +52,7 @@ IMPORTANTE - LEIA COM ATENÇÃO:
 
 Este aplicativo é fornecido "como está", sem garantias de qualquer tipo, expressas ou implícitas.
 
-O AXYN é uma ferramenta de APOIO e CONSULTA RÁPIDA. Não deve ser utilizado como única fonte de informação para decisões clínicas.
+O axys é uma ferramenta de APOIO e CONSULTA RÁPIDA. Não deve ser utilizado como única fonte de informação para decisões clínicas.
 
 RESPONSABILIDADES DO USUÁRIO:
 • Verificar todas as dosagens com bulas e protocolos oficiais

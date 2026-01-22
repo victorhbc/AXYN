@@ -1,11 +1,11 @@
 /// Application string constants
 abstract class AppStrings {
   // App Info
-  static const String appName = 'AXYN';
+  static const String appName = 'axys';
   static const String appVersion = '1.0.0';
   static const String appDescription =
       'Calculadoras médicas e dosagens pediátricas para profissionais de saúde';
-  static const String copyright = '© 2026 AXYN. Todos os direitos reservados.';
+  static const String copyright = '© 2026 axys. Todos os direitos reservados.';
   static const String developerMessage =
       'Desenvolvido com ❤️ para profissionais de saúde';
 

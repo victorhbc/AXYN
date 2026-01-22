@@ -5,7 +5,7 @@ import 'dart:math' as math;
 /// Generates the app icon PNG files
 /// Run with: dart run tool/generate_icon.dart
 void main() async {
-  print('Generating AXYN app icons...');
+  print('Generating axys app icons...');
   
   // Generate main icon (1024x1024)
   final mainIcon = generateIcon(1024);
@@ -184,8 +184,8 @@ List<List<int>> generateIcon(int size) {
     }
   }
   
-  // Draw "AXYN" text
-  drawText(pixels, size, 'AXYN', size * 0.18);
+  // Draw "axys" text
+  drawText(pixels, size, 'axys', size * 0.18);
   
   return pixels;
 }
@@ -220,8 +220,8 @@ List<List<int>> generateIconForeground(int size) {
     }
   }
   
-  // Draw "AXYN" text in blue
-  drawTextColored(pixels, size, 'AXYN', size * 0.12, 0x15, 0x65, 0xC0);
+  // Draw "axys" text in blue
+  drawTextColored(pixels, size, 'axys', size * 0.12, 0x15, 0x65, 0xC0);
   
   return pixels;
 }
@@ -263,7 +263,7 @@ void setPixel(List<List<int>> pixels, int x, int y, int r, int g, int b, int a) 
   }
 }
 
-// Simple bitmap font for "AXYN"
+// Simple bitmap font for "axys"
 final Map<String, List<String>> font = {
   'A': [
     '  ##  ',

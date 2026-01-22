@@ -1,4 +1,4 @@
-package com.plantaofacil.axyn
+package com.plantaofacil.axys
 
 import io.flutter.embedding.android.FlutterActivity
 
