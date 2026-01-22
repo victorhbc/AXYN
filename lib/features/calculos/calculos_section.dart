@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../../core/constants/app_strings.dart';
 import '../../data/data.dart';
+import '../../shared/shared.dart';
 import 'screens/screens.dart';
 import 'widgets/calculator_grid_item.dart';
 import 'widgets/edit_items_sheet.dart';
+
+/// Breakpoint for split-screen layout
+const double _kSplitScreenBreakpoint = 900;
 
 /// Main section displaying all calculators in a grid
 class CalculosSection extends StatefulWidget {
@@ -16,6 +20,7 @@ class CalculosSection extends StatefulWidget {
 
 class _CalculosSectionState extends State<CalculosSection> {
   final CalculationStore _store = CalculationStore();
+  CalculoItem? _selectedItem;
 
   static final List<CalculoItem> _allItems = [
     const CalculoItem(
@@ -168,6 +173,21 @@ class _CalculosSectionState extends State<CalculosSection> {
 
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWideScreen = constraints.maxWidth >= _kSplitScreenBreakpoint;
+
+        if (isWideScreen) {
+          return _buildSplitLayout();
+        } else {
+          return _buildSingleLayout();
+        }
+      },
+    );
+  }
+
+  /// Single column layout for narrow screens (mobile)
+  Widget _buildSingleLayout() {
     final hasAnyResult = _store.hasAnyResult;
     final visibleItems = _visibleItems;
 
@@ -180,10 +200,48 @@ class _CalculosSectionState extends State<CalculosSection> {
             _buildHeader(hasAnyResult),
             const SizedBox(height: 16),
             Expanded(
-              child: _buildGrid(visibleItems),
+              child: _buildGrid(visibleItems, isSplitView: false),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Split layout for wide screens (web/desktop)
+  Widget _buildSplitLayout() {
+    final hasAnyResult = _store.hasAnyResult;
+    final visibleItems = _visibleItems;
+
+    return SafeArea(
+      child: Row(
+        children: [
+          // Left panel - Calculator list
+          SizedBox(
+            width: 380,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(hasAnyResult),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: _buildGrid(visibleItems, isSplitView: true),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Divider
+          const VerticalDivider(width: 1, thickness: 1),
+          // Right panel - Selected calculator or placeholder
+          Expanded(
+            child: _selectedItem?.page != null
+                ? _buildDetailPanel(_selectedItem!)
+                : _buildPlaceholder(),
+          ),
+        ],
       ),
     );
   }
@@ -206,11 +264,11 @@ class _CalculosSectionState extends State<CalculosSection> {
               tooltip: 'Editar calculadoras',
             ),
             if (hasAnyResult)
-              TextButton.icon(
+              IconButton(
                 onPressed: _showClearAllDialog,
-                icon: const Icon(Icons.delete_outline, size: 18),
-                label: const Text(AppStrings.limparTudo),
-                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                icon: const Icon(Icons.delete_outline),
+                tooltip: AppStrings.limparTudo,
+                color: Colors.red,
               ),
           ],
         ),
@@ -218,10 +276,10 @@ class _CalculosSectionState extends State<CalculosSection> {
     );
   }
 
-  Widget _buildGrid(List<CalculoItem> items) {
+  Widget _buildGrid(List<CalculoItem> items, {required bool isSplitView}) {
     return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: isSplitView ? 2 : _calculateCrossAxisCount(context),
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
         childAspectRatio: 1.0,
@@ -236,6 +294,7 @@ class _CalculosSectionState extends State<CalculosSection> {
         final classification = item.storeKey != null
             ? _store.getClassification(item.storeKey!)
             : null;
+        final isSelected = isSplitView && _selectedItem?.storeKey == item.storeKey;
 
         return CalculatorGridItem(
           title: item.title,
@@ -245,7 +304,8 @@ class _CalculosSectionState extends State<CalculosSection> {
           resultUnit: item.resultUnit,
           classification: classification,
           hasResult: hasResult,
-          onTap: () => _navigateToCalculator(item),
+          isSelected: isSelected,
+          onTap: () => _onItemTap(item, isSplitView),
           onClear: hasResult && item.storeKey != null
               ? () => _clearResult(item.storeKey!)
               : null,
@@ -254,20 +314,78 @@ class _CalculosSectionState extends State<CalculosSection> {
     );
   }
 
-  void _navigateToCalculator(CalculoItem item) {
-    if (item.page != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => item.page!),
-      );
-    } else {
+  int _calculateCrossAxisCount(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    if (width >= 800) return 4;
+    if (width >= 600) return 3;
+    return 2;
+  }
+
+  void _onItemTap(CalculoItem item, bool isSplitView) {
+    if (item.page == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${item.title} - Em breve'),
           duration: const Duration(seconds: 1),
         ),
       );
+      return;
     }
+
+    if (isSplitView) {
+      // In split view, show in the right panel
+      setState(() {
+        _selectedItem = item;
+      });
+    } else {
+      // In single view, navigate to new page
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => item.page!),
+      );
+    }
+  }
+
+  Widget _buildDetailPanel(CalculoItem item) {
+    return ClipRect(
+      child: Navigator(
+        key: ValueKey(item.storeKey),
+        onGenerateRoute: (settings) {
+          return MaterialPageRoute(
+            builder: (context) => item.page!,
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.calculate_outlined,
+            size: 80,
+            color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Selecione uma calculadora',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Escolha um item da lista à esquerda',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.outline.withOpacity(0.7),
+                ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _clearResult(String storeKey) {

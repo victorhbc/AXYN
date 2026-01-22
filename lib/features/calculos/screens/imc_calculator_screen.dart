@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../data/store/calculation_store.dart';
 import '../../../shared/shared.dart';
+import '../../../shared/widgets/responsive_layout.dart';
 
 class ImcCalculatorScreen extends StatefulWidget {
   const ImcCalculatorScreen({super.key});
@@ -127,57 +128,60 @@ class _ImcCalculatorScreenState extends State<ImcCalculatorScreen> {
         title: const Text(AppStrings.imcTitle),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Icon(
-              Icons.monitor_weight_outlined,
-              size: 80,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              AppStrings.imcSubtitle,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            AppTextField(
-              controller: _pesoController,
-              labelText: AppStrings.pesoKg,
-              hintText: 'Ex: 70',
-              prefixIcon: Icons.fitness_center,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            ),
-            const SizedBox(height: 16),
-            AppTextField(
-              controller: _alturaController,
-              labelText: AppStrings.alturaHint,
-              hintText: 'Ex: 1.75 ou 175',
-              prefixIcon: Icons.height,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            ),
-            const SizedBox(height: 24),
-            CalculateButtons(
-              onCalculate: _calcularIMC,
-              onClear: _limpar,
-            ),
-            if (_imc != null) ...[
-              const SizedBox(height: 32),
-              ResultCard(
-                title: 'Seu IMC',
-                value: _imc!.toStringAsFixed(1),
-                classification: _classificacao,
-                color: _classificacaoColor,
+      body: ResponsiveContent(
+        maxWidth: 600,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Icon(
+                Icons.monitor_weight_outlined,
+                size: 80,
+                color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(height: 24),
-              _buildImcTable(),
+              Text(
+                AppStrings.imcSubtitle,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              AppTextField(
+                controller: _pesoController,
+                labelText: AppStrings.pesoKg,
+                hintText: 'Ex: 70',
+                prefixIcon: Icons.fitness_center,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _alturaController,
+                labelText: AppStrings.alturaHint,
+                hintText: 'Ex: 1.75 ou 175',
+                prefixIcon: Icons.height,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
+              const SizedBox(height: 24),
+              CalculateButtons(
+                onCalculate: _calcularIMC,
+                onClear: _limpar,
+              ),
+              if (_imc != null) ...[
+                const SizedBox(height: 32),
+                ResultCard(
+                  title: 'Seu IMC',
+                  value: _imc!.toStringAsFixed(1),
+                  classification: _classificacao,
+                  color: _classificacaoColor,
+                ),
+                const SizedBox(height: 24),
+                _buildImcTable(),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

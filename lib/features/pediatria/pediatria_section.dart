@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../data/store/calculation_store.dart';
+import '../../shared/shared.dart';
 import 'data/pediatric_drugs.dart';
 import 'widgets/drug_dosage_card.dart';
 import 'widgets/weight_selector.dart';
@@ -48,14 +49,17 @@ class _PediatriaSectionState extends State<PediatriaSection> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(context),
-          Expanded(
-            child: _buildDrugList(),
-          ),
-        ],
+      child: ResponsiveContent(
+        maxWidth: 800,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(context),
+            Expanded(
+              child: _buildDrugList(),
+            ),
+          ],
+        ),
       ),
     );
   }

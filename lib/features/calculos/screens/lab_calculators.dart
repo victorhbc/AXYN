@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../data/store/calculation_store.dart';
 import '../../../shared/shared.dart';
+import '../../../shared/widgets/responsive_layout.dart';
 
 // ==================== CORREÇÃO DE SÓDIO ====================
 class SodiumCorrectionScreen extends StatefulWidget {
@@ -68,27 +69,30 @@ class _SodiumCorrectionScreenState extends State<SodiumCorrectionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Correção de Sódio'), centerTitle: true),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Icon(Icons.science_outlined, size: 80, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(height: 24),
-            Text('Sódio Corrigido pela Glicemia', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-            const SizedBox(height: 8),
-            Text('Na⁺ corr = Na⁺ + 1.6 × ((Glic - 100) / 100)', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey), textAlign: TextAlign.center),
-            const SizedBox(height: 32),
-            AppTextField(controller: _sodiumController, labelText: 'Sódio medido (mEq/L)', hintText: 'Ex: 130', prefixIcon: Icons.water_drop_outlined, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
-            const SizedBox(height: 16),
-            AppTextField(controller: _glucoseController, labelText: 'Glicemia (mg/dL)', hintText: 'Ex: 400', prefixIcon: Icons.bloodtype_outlined, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
-            const SizedBox(height: 24),
-            CalculateButtons(onCalculate: _calcular, onClear: _limpar),
-            if (_correctedSodium != null) ...[
+      body: ResponsiveContent(
+        maxWidth: 600,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Icon(Icons.science_outlined, size: 80, color: Theme.of(context).colorScheme.primary),
+              const SizedBox(height: 24),
+              Text('Sódio Corrigido pela Glicemia', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+              const SizedBox(height: 8),
+              Text('Na⁺ corr = Na⁺ + 1.6 × ((Glic - 100) / 100)', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey), textAlign: TextAlign.center),
               const SizedBox(height: 32),
-              ResultCard(title: 'Sódio Corrigido', value: _correctedSodium!.toStringAsFixed(1), unit: 'mEq/L', classification: _getClassification(_correctedSodium!), color: _getColor(_correctedSodium!)),
+              AppTextField(controller: _sodiumController, labelText: 'Sódio medido (mEq/L)', hintText: 'Ex: 130', prefixIcon: Icons.water_drop_outlined, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+              const SizedBox(height: 16),
+              AppTextField(controller: _glucoseController, labelText: 'Glicemia (mg/dL)', hintText: 'Ex: 400', prefixIcon: Icons.bloodtype_outlined, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+              const SizedBox(height: 24),
+              CalculateButtons(onCalculate: _calcular, onClear: _limpar),
+              if (_correctedSodium != null) ...[
+                const SizedBox(height: 32),
+                ResultCard(title: 'Sódio Corrigido', value: _correctedSodium!.toStringAsFixed(1), unit: 'mEq/L', classification: _getClassification(_correctedSodium!), color: _getColor(_correctedSodium!)),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -165,31 +169,34 @@ class _OsmolarityScreenState extends State<OsmolarityScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Osmolaridade Plasmática'), centerTitle: true),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Icon(Icons.opacity_outlined, size: 80, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(height: 24),
-            Text('Osmolaridade Calculada', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-            const SizedBox(height: 8),
-            Text('Osm = 2×Na + (Glic/18) + (Ureia/6)', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey), textAlign: TextAlign.center),
-            const SizedBox(height: 32),
-            AppTextField(controller: _sodiumController, labelText: 'Sódio (mEq/L)', hintText: 'Ex: 140', prefixIcon: Icons.water_drop_outlined, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
-            const SizedBox(height: 16),
-            AppTextField(controller: _glucoseController, labelText: 'Glicemia (mg/dL)', hintText: 'Ex: 100', prefixIcon: Icons.bloodtype_outlined, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
-            const SizedBox(height: 16),
-            AppTextField(controller: _ureaController, labelText: 'Ureia (mg/dL)', hintText: 'Ex: 40', prefixIcon: Icons.science_outlined, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
-            const SizedBox(height: 24),
-            CalculateButtons(onCalculate: _calcular, onClear: _limpar),
-            if (_osmolarity != null) ...[
-              const SizedBox(height: 32),
-              ResultCard(title: 'Osmolaridade', value: _osmolarity!.toStringAsFixed(1), unit: 'mOsm/L', classification: _getClassification(_osmolarity!), color: _getColor(_osmolarity!)),
+      body: ResponsiveContent(
+        maxWidth: 600,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Icon(Icons.opacity_outlined, size: 80, color: Theme.of(context).colorScheme.primary),
+              const SizedBox(height: 24),
+              Text('Osmolaridade Calculada', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
               const SizedBox(height: 8),
-              Text('Normal: 280-295 mOsm/L', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey), textAlign: TextAlign.center),
+              Text('Osm = 2×Na + (Glic/18) + (Ureia/6)', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey), textAlign: TextAlign.center),
+              const SizedBox(height: 32),
+              AppTextField(controller: _sodiumController, labelText: 'Sódio (mEq/L)', hintText: 'Ex: 140', prefixIcon: Icons.water_drop_outlined, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+              const SizedBox(height: 16),
+              AppTextField(controller: _glucoseController, labelText: 'Glicemia (mg/dL)', hintText: 'Ex: 100', prefixIcon: Icons.bloodtype_outlined, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+              const SizedBox(height: 16),
+              AppTextField(controller: _ureaController, labelText: 'Ureia (mg/dL)', hintText: 'Ex: 40', prefixIcon: Icons.science_outlined, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+              const SizedBox(height: 24),
+              CalculateButtons(onCalculate: _calcular, onClear: _limpar),
+              if (_osmolarity != null) ...[
+                const SizedBox(height: 32),
+                ResultCard(title: 'Osmolaridade', value: _osmolarity!.toStringAsFixed(1), unit: 'mOsm/L', classification: _getClassification(_osmolarity!), color: _getColor(_osmolarity!)),
+                const SizedBox(height: 8),
+                Text('Normal: 280-295 mOsm/L', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey), textAlign: TextAlign.center),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -261,34 +268,37 @@ class _GestationalAgeScreenState extends State<GestationalAgeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Idade Gestacional'), centerTitle: true),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Icon(Icons.pregnant_woman_outlined, size: 80, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(height: 24),
-            Text('Calculadora Obstétrica', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-            const SizedBox(height: 32),
-            FilledButton.icon(
-              onPressed: _selectDate,
-              icon: const Icon(Icons.calendar_today),
-              label: Text(_dum != null ? 'DUM: ${_formatDate(_dum!)}' : 'Selecionar DUM'),
-              style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
-            ),
-            if (_dum != null) ...[
-              const SizedBox(height: 12),
-              OutlinedButton.icon(onPressed: _limpar, icon: const Icon(Icons.refresh), label: const Text('Limpar')),
-            ],
-            if (_semanas != null && _dpp != null) ...[
-              const SizedBox(height: 32),
-              _buildIGCard(context),
-              const SizedBox(height: 16),
-              _buildDPPCard(context),
+      body: ResponsiveContent(
+        maxWidth: 600,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Icon(Icons.pregnant_woman_outlined, size: 80, color: Theme.of(context).colorScheme.primary),
               const SizedBox(height: 24),
-              _buildInfoTable(context),
+              Text('Calculadora Obstétrica', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+              const SizedBox(height: 32),
+              FilledButton.icon(
+                onPressed: _selectDate,
+                icon: const Icon(Icons.calendar_today),
+                label: Text(_dum != null ? 'DUM: ${_formatDate(_dum!)}' : 'Selecionar DUM'),
+                style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+              ),
+              if (_dum != null) ...[
+                const SizedBox(height: 12),
+                OutlinedButton.icon(onPressed: _limpar, icon: const Icon(Icons.refresh), label: const Text('Limpar')),
+              ],
+              if (_semanas != null && _dpp != null) ...[
+                const SizedBox(height: 32),
+                _buildIGCard(context),
+                const SizedBox(height: 16),
+                _buildDPPCard(context),
+                const SizedBox(height: 24),
+                _buildInfoTable(context),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

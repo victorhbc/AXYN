@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_strings.dart';
+import '../../shared/shared.dart';
 import 'data/legal_content.dart';
 import 'widgets/app_info_card.dart';
 import 'widgets/expandable_section_card.dart';
@@ -14,40 +15,43 @@ class SobreSection extends StatelessWidget {
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTitle(context),
-            const SizedBox(height: 24),
-            const AppInfoCard(),
-            const SizedBox(height: 24),
-            const ExpandableSectionCard(
-              title: 'Termos de Uso',
-              icon: Icons.description_outlined,
-              content: LegalContent.termsOfUse,
-            ),
-            const SizedBox(height: 16),
-            const ExpandableSectionCard(
-              title: 'Política de Privacidade',
-              icon: Icons.privacy_tip_outlined,
-              content: LegalContent.privacyPolicy,
-            ),
-            const SizedBox(height: 16),
-            const ExpandableSectionCard(
-              title: 'Aviso Legal',
-              icon: Icons.gavel_outlined,
-              content: LegalContent.legalNotice,
-            ),
-            const SizedBox(height: 16),
-            const ExpandableSectionCard(
-              title: 'Referências',
-              icon: Icons.menu_book_outlined,
-              content: LegalContent.references,
-            ),
-            const SizedBox(height: 24),
-            _buildFooter(context),
-            const SizedBox(height: 32),
-          ],
+        child: ResponsiveContent(
+          maxWidth: 700,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTitle(context),
+              const SizedBox(height: 24),
+              const AppInfoCard(),
+              const SizedBox(height: 24),
+              const ExpandableSectionCard(
+                title: 'Termos de Uso',
+                icon: Icons.description_outlined,
+                content: LegalContent.termsOfUse,
+              ),
+              const SizedBox(height: 16),
+              const ExpandableSectionCard(
+                title: 'Política de Privacidade',
+                icon: Icons.privacy_tip_outlined,
+                content: LegalContent.privacyPolicy,
+              ),
+              const SizedBox(height: 16),
+              const ExpandableSectionCard(
+                title: 'Aviso Legal',
+                icon: Icons.gavel_outlined,
+                content: LegalContent.legalNotice,
+              ),
+              const SizedBox(height: 16),
+              const ExpandableSectionCard(
+                title: 'Referências',
+                icon: Icons.menu_book_outlined,
+                content: LegalContent.references,
+              ),
+              const SizedBox(height: 24),
+              _buildFooter(context),
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       ),
     );

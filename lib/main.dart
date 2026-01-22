@@ -4,6 +4,7 @@ import 'core/core.dart';
 import 'features/calculos/calculos_section.dart';
 import 'features/pediatria/pediatria_section.dart';
 import 'features/sobre/sobre_section.dart';
+import 'shared/shared.dart';
 
 void main() {
   runApp(const MainApp());
@@ -24,7 +25,7 @@ class MainApp extends StatelessWidget {
   }
 }
 
-/// Main screen with bottom navigation
+/// Main screen with responsive navigation
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -35,41 +36,41 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [
-    const CalculosSection(),
-    const PediatriaSection(),
-    const SobreSection(),
+  static const List<Widget> _pages = [
+    CalculosSection(),
+    PediatriaSection(),
+    SobreSection(),
+  ];
+
+  static const List<NavigationItem> _destinations = [
+    NavigationItem(
+      icon: Icons.calculate_outlined,
+      selectedIcon: Icons.calculate,
+      label: AppStrings.calculosTab,
+    ),
+    NavigationItem(
+      icon: Icons.medication_outlined,
+      selectedIcon: Icons.medication,
+      label: AppStrings.pediatriaTab,
+    ),
+    NavigationItem(
+      icon: Icons.info_outline,
+      selectedIcon: Icons.info,
+      label: AppStrings.sobreTab,
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_currentIndex],
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.calculate_outlined),
-            selectedIcon: Icon(Icons.calculate),
-            label: AppStrings.calculosTab,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.medication_outlined),
-            selectedIcon: Icon(Icons.medication),
-            label: AppStrings.pediatriaTab,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.info_outline),
-            selectedIcon: Icon(Icons.info),
-            label: AppStrings.sobreTab,
-          ),
-        ],
-      ),
+    return ResponsiveScaffold(
+      currentIndex: _currentIndex,
+      onDestinationSelected: (index) {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+      pages: _pages,
+      destinations: _destinations,
     );
   }
 }

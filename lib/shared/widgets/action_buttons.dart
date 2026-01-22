@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../core/constants/app_strings.dart';
 
+/// Dismisses the keyboard by unfocusing the current focus node
+void _dismissKeyboard(BuildContext context) {
+  FocusScope.of(context).unfocus();
+}
+
 /// Reusable action buttons row (Calculate + Clear)
 class CalculateButtons extends StatelessWidget {
   final VoidCallback onCalculate;
@@ -23,7 +28,10 @@ class CalculateButtons extends StatelessWidget {
       children: [
         Expanded(
           child: FilledButton.icon(
-            onPressed: onCalculate,
+            onPressed: () {
+              _dismissKeyboard(context);
+              onCalculate();
+            },
             icon: const Icon(Icons.calculate),
             label: Text(calculateLabel),
             style: FilledButton.styleFrom(
@@ -36,7 +44,10 @@ class CalculateButtons extends StatelessWidget {
         ),
         const SizedBox(width: 12),
         OutlinedButton.icon(
-          onPressed: onClear,
+          onPressed: () {
+            _dismissKeyboard(context);
+            onClear();
+          },
           icon: const Icon(Icons.refresh),
           label: Text(clearLabel),
           style: OutlinedButton.styleFrom(
@@ -72,14 +83,22 @@ class SaveClearButtons extends StatelessWidget {
       children: [
         Expanded(
           child: FilledButton.icon(
-            onPressed: onSave,
+            onPressed: onSave != null
+                ? () {
+                    _dismissKeyboard(context);
+                    onSave!();
+                  }
+                : null,
             icon: const Icon(Icons.save),
             label: Text(saveLabel),
           ),
         ),
         const SizedBox(width: 12),
         OutlinedButton.icon(
-          onPressed: onClear,
+          onPressed: () {
+            _dismissKeyboard(context);
+            onClear();
+          },
           icon: const Icon(Icons.refresh),
           label: Text(clearLabel),
         ),

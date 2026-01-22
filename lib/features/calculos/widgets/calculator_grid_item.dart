@@ -12,6 +12,7 @@ class CalculatorGridItem extends StatelessWidget {
   final String? resultUnit;
   final String? classification;
   final bool hasResult;
+  final bool isSelected;
   final VoidCallback? onClear;
 
   const CalculatorGridItem({
@@ -24,17 +25,31 @@ class CalculatorGridItem extends StatelessWidget {
     this.resultUnit,
     this.classification,
     this.hasResult = false,
+    this.isSelected = false,
     this.onClear,
   });
 
   @override
   Widget build(BuildContext context) {
     final classificationColor = ClassificationColors.getColor(classification);
+    final primaryColor = Theme.of(context).colorScheme.primary;
+
+    Color backgroundColor;
+    Border? border;
+
+    if (isSelected) {
+      backgroundColor = primaryColor.withOpacity(0.15);
+      border = Border.all(color: primaryColor, width: 2);
+    } else if (hasResult) {
+      backgroundColor = classificationColor.withOpacity(0.15);
+      border = Border.all(color: classificationColor.withOpacity(0.5), width: 2);
+    } else {
+      backgroundColor = Theme.of(context).colorScheme.surfaceContainerHighest;
+      border = null;
+    }
 
     return Material(
-      color: hasResult
-          ? classificationColor.withOpacity(0.15)
-          : Theme.of(context).colorScheme.surfaceContainerHighest,
+      color: backgroundColor,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
@@ -42,12 +57,7 @@ class CalculatorGridItem extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: hasResult
-                ? Border.all(
-                    color: classificationColor.withOpacity(0.5),
-                    width: 2,
-                  )
-                : null,
+            border: border,
           ),
           padding: const EdgeInsets.all(12),
           child: Stack(

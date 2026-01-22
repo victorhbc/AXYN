@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../data/store/calculation_store.dart';
 import '../../../shared/shared.dart';
+import '../../../shared/widgets/responsive_layout.dart';
 
 // ==================== DOSE POR PESO ====================
 class DosePorPesoScreen extends StatefulWidget {
@@ -66,25 +67,28 @@ class _DosePorPesoScreenState extends State<DosePorPesoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Dose por Peso'), centerTitle: true),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Icon(Icons.medication_outlined, size: 80, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(height: 24),
-            Text('Cálculo de Dose', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-            const SizedBox(height: 32),
-            AppTextField(controller: _pesoController, labelText: 'Peso (kg)', hintText: 'Ex: 70', prefixIcon: Icons.fitness_center, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
-            const SizedBox(height: 16),
-            AppTextField(controller: _doseController, labelText: 'Dose (mg/kg)', hintText: 'Ex: 10', prefixIcon: Icons.science_outlined, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
-            const SizedBox(height: 24),
-            CalculateButtons(onCalculate: _calcular, onClear: _limpar),
-            if (_resultado != null) ...[
+      body: ResponsiveContent(
+        maxWidth: 600,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Icon(Icons.medication_outlined, size: 80, color: Theme.of(context).colorScheme.primary),
+              const SizedBox(height: 24),
+              Text('Cálculo de Dose', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
               const SizedBox(height: 32),
-              ResultCard(title: 'Dose Total', value: _resultado!.toStringAsFixed(1), unit: 'mg', color: Colors.blue),
+              AppTextField(controller: _pesoController, labelText: 'Peso (kg)', hintText: 'Ex: 70', prefixIcon: Icons.fitness_center, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+              const SizedBox(height: 16),
+              AppTextField(controller: _doseController, labelText: 'Dose (mg/kg)', hintText: 'Ex: 10', prefixIcon: Icons.science_outlined, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+              const SizedBox(height: 24),
+              CalculateButtons(onCalculate: _calcular, onClear: _limpar),
+              if (_resultado != null) ...[
+                const SizedBox(height: 32),
+                ResultCard(title: 'Dose Total', value: _resultado!.toStringAsFixed(1), unit: 'mg', color: Colors.blue),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -136,39 +140,42 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Escala de Glasgow'), centerTitle: true),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (_total > 0) ScoreDisplay(score: '$_total', classification: _getClassificacao(_total), color: _getColor(_total)),
-            const SizedBox(height: 24),
-            SectionCard(title: 'Abertura Ocular', children: [
-              _buildRadio('Espontânea', 4, _ocular, (v) => setState(() => _ocular = v!)),
-              _buildRadio('Ao estímulo verbal', 3, _ocular, (v) => setState(() => _ocular = v!)),
-              _buildRadio('Ao estímulo doloroso', 2, _ocular, (v) => setState(() => _ocular = v!)),
-              _buildRadio('Ausente', 1, _ocular, (v) => setState(() => _ocular = v!)),
-            ]),
-            const SizedBox(height: 16),
-            SectionCard(title: 'Resposta Verbal', children: [
-              _buildRadio('Orientada', 5, _verbal, (v) => setState(() => _verbal = v!)),
-              _buildRadio('Confusa', 4, _verbal, (v) => setState(() => _verbal = v!)),
-              _buildRadio('Palavras inapropriadas', 3, _verbal, (v) => setState(() => _verbal = v!)),
-              _buildRadio('Sons incompreensíveis', 2, _verbal, (v) => setState(() => _verbal = v!)),
-              _buildRadio('Ausente', 1, _verbal, (v) => setState(() => _verbal = v!)),
-            ]),
-            const SizedBox(height: 16),
-            SectionCard(title: 'Resposta Motora', children: [
-              _buildRadio('Obedece comandos', 6, _motor, (v) => setState(() => _motor = v!)),
-              _buildRadio('Localiza dor', 5, _motor, (v) => setState(() => _motor = v!)),
-              _buildRadio('Movimento de retirada', 4, _motor, (v) => setState(() => _motor = v!)),
-              _buildRadio('Flexão anormal', 3, _motor, (v) => setState(() => _motor = v!)),
-              _buildRadio('Extensão anormal', 2, _motor, (v) => setState(() => _motor = v!)),
-              _buildRadio('Ausente', 1, _motor, (v) => setState(() => _motor = v!)),
-            ]),
-            const SizedBox(height: 24),
-            SaveClearButtons(onSave: _total > 0 ? _salvar : null, onClear: _limpar),
-          ],
+      body: ResponsiveContent(
+        maxWidth: 600,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (_total > 0) ScoreDisplay(score: '$_total', classification: _getClassificacao(_total), color: _getColor(_total)),
+              const SizedBox(height: 24),
+              SectionCard(title: 'Abertura Ocular', children: [
+                _buildRadio('Espontânea', 4, _ocular, (v) => setState(() => _ocular = v!)),
+                _buildRadio('Ao estímulo verbal', 3, _ocular, (v) => setState(() => _ocular = v!)),
+                _buildRadio('Ao estímulo doloroso', 2, _ocular, (v) => setState(() => _ocular = v!)),
+                _buildRadio('Ausente', 1, _ocular, (v) => setState(() => _ocular = v!)),
+              ]),
+              const SizedBox(height: 16),
+              SectionCard(title: 'Resposta Verbal', children: [
+                _buildRadio('Orientada', 5, _verbal, (v) => setState(() => _verbal = v!)),
+                _buildRadio('Confusa', 4, _verbal, (v) => setState(() => _verbal = v!)),
+                _buildRadio('Palavras inapropriadas', 3, _verbal, (v) => setState(() => _verbal = v!)),
+                _buildRadio('Sons incompreensíveis', 2, _verbal, (v) => setState(() => _verbal = v!)),
+                _buildRadio('Ausente', 1, _verbal, (v) => setState(() => _verbal = v!)),
+              ]),
+              const SizedBox(height: 16),
+              SectionCard(title: 'Resposta Motora', children: [
+                _buildRadio('Obedece comandos', 6, _motor, (v) => setState(() => _motor = v!)),
+                _buildRadio('Localiza dor', 5, _motor, (v) => setState(() => _motor = v!)),
+                _buildRadio('Movimento de retirada', 4, _motor, (v) => setState(() => _motor = v!)),
+                _buildRadio('Flexão anormal', 3, _motor, (v) => setState(() => _motor = v!)),
+                _buildRadio('Extensão anormal', 2, _motor, (v) => setState(() => _motor = v!)),
+                _buildRadio('Ausente', 1, _motor, (v) => setState(() => _motor = v!)),
+              ]),
+              const SizedBox(height: 24),
+              SaveClearButtons(onSave: _total > 0 ? _salvar : null, onClear: _limpar),
+            ],
+          ),
         ),
       ),
     );
@@ -241,24 +248,27 @@ class _Cha2ds2VascScreenState extends State<Cha2ds2VascScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('CHA₂DS₂-VASc'), centerTitle: true),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ScoreDisplay(score: '$_score', classification: _getClassificacao(_score), color: _getColor(_score), subtitle: _getRecomendacao(_score)),
-            const SizedBox(height: 24),
-            ScoreCheckboxOption(label: 'C - Insuficiência cardíaca', points: '+1', value: _chf, onChanged: (v) => setState(() => _chf = v!)),
-            ScoreCheckboxOption(label: 'H - Hipertensão', points: '+1', value: _hypertension, onChanged: (v) => setState(() => _hypertension = v!)),
-            ScoreCheckboxOption(label: 'A₂ - Idade ≥ 75 anos', points: '+2', value: _age75, onChanged: (v) => setState(() => _age75 = v!)),
-            ScoreCheckboxOption(label: 'D - Diabetes mellitus', points: '+1', value: _diabetes, onChanged: (v) => setState(() => _diabetes = v!)),
-            ScoreCheckboxOption(label: 'S₂ - AVC/AIT/Tromboembolismo', points: '+2', value: _stroke, onChanged: (v) => setState(() => _stroke = v!)),
-            ScoreCheckboxOption(label: 'V - Doença vascular', points: '+1', value: _vascular, onChanged: (v) => setState(() => _vascular = v!)),
-            ScoreCheckboxOption(label: 'A - Idade 65-74 anos', points: '+1', value: _age65, onChanged: (v) => setState(() => _age65 = v!)),
-            ScoreCheckboxOption(label: 'Sc - Sexo feminino', points: '+1', value: _female, onChanged: (v) => setState(() => _female = v!)),
-            const SizedBox(height: 24),
-            SaveClearButtons(onSave: _salvar, onClear: _limpar),
-          ],
+      body: ResponsiveContent(
+        maxWidth: 600,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ScoreDisplay(score: '$_score', classification: _getClassificacao(_score), color: _getColor(_score), subtitle: _getRecomendacao(_score)),
+              const SizedBox(height: 24),
+              ScoreCheckboxOption(label: 'C - Insuficiência cardíaca', points: '+1', value: _chf, onChanged: (v) => setState(() => _chf = v!)),
+              ScoreCheckboxOption(label: 'H - Hipertensão', points: '+1', value: _hypertension, onChanged: (v) => setState(() => _hypertension = v!)),
+              ScoreCheckboxOption(label: 'A₂ - Idade ≥ 75 anos', points: '+2', value: _age75, onChanged: (v) => setState(() => _age75 = v!)),
+              ScoreCheckboxOption(label: 'D - Diabetes mellitus', points: '+1', value: _diabetes, onChanged: (v) => setState(() => _diabetes = v!)),
+              ScoreCheckboxOption(label: 'S₂ - AVC/AIT/Tromboembolismo', points: '+2', value: _stroke, onChanged: (v) => setState(() => _stroke = v!)),
+              ScoreCheckboxOption(label: 'V - Doença vascular', points: '+1', value: _vascular, onChanged: (v) => setState(() => _vascular = v!)),
+              ScoreCheckboxOption(label: 'A - Idade 65-74 anos', points: '+1', value: _age65, onChanged: (v) => setState(() => _age65 = v!)),
+              ScoreCheckboxOption(label: 'Sc - Sexo feminino', points: '+1', value: _female, onChanged: (v) => setState(() => _female = v!)),
+              const SizedBox(height: 24),
+              SaveClearButtons(onSave: _salvar, onClear: _limpar),
+            ],
+          ),
         ),
       ),
     );
@@ -315,25 +325,28 @@ class _HasBledScreenState extends State<HasBledScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('HAS-BLED'), centerTitle: true),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ScoreDisplay(score: '$_score', classification: _getClassificacao(_score), color: _getColor(_score)),
-            const SizedBox(height: 24),
-            CheckboxListTile(title: const Text('H - Hipertensão (PAS > 160)'), value: _hypertension, onChanged: (v) => setState(() => _hypertension = v!)),
-            CheckboxListTile(title: const Text('A - Função renal anormal'), value: _renal, onChanged: (v) => setState(() => _renal = v!)),
-            CheckboxListTile(title: const Text('A - Função hepática anormal'), value: _liver, onChanged: (v) => setState(() => _liver = v!)),
-            CheckboxListTile(title: const Text('S - AVC prévio'), value: _stroke, onChanged: (v) => setState(() => _stroke = v!)),
-            CheckboxListTile(title: const Text('B - Sangramento prévio'), value: _bleeding, onChanged: (v) => setState(() => _bleeding = v!)),
-            CheckboxListTile(title: const Text('L - INR lábil'), value: _labile, onChanged: (v) => setState(() => _labile = v!)),
-            CheckboxListTile(title: const Text('E - Idade > 65 anos'), value: _age, onChanged: (v) => setState(() => _age = v!)),
-            CheckboxListTile(title: const Text('D - Uso de drogas (AINEs/antiplaq.)'), value: _drugs, onChanged: (v) => setState(() => _drugs = v!)),
-            CheckboxListTile(title: const Text('D - Uso de álcool'), value: _alcohol, onChanged: (v) => setState(() => _alcohol = v!)),
-            const SizedBox(height: 24),
-            SaveClearButtons(onSave: _salvar, onClear: _limpar),
-          ],
+      body: ResponsiveContent(
+        maxWidth: 600,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ScoreDisplay(score: '$_score', classification: _getClassificacao(_score), color: _getColor(_score)),
+              const SizedBox(height: 24),
+              CheckboxListTile(title: const Text('H - Hipertensão (PAS > 160)'), value: _hypertension, onChanged: (v) => setState(() => _hypertension = v!)),
+              CheckboxListTile(title: const Text('A - Função renal anormal'), value: _renal, onChanged: (v) => setState(() => _renal = v!)),
+              CheckboxListTile(title: const Text('A - Função hepática anormal'), value: _liver, onChanged: (v) => setState(() => _liver = v!)),
+              CheckboxListTile(title: const Text('S - AVC prévio'), value: _stroke, onChanged: (v) => setState(() => _stroke = v!)),
+              CheckboxListTile(title: const Text('B - Sangramento prévio'), value: _bleeding, onChanged: (v) => setState(() => _bleeding = v!)),
+              CheckboxListTile(title: const Text('L - INR lábil'), value: _labile, onChanged: (v) => setState(() => _labile = v!)),
+              CheckboxListTile(title: const Text('E - Idade > 65 anos'), value: _age, onChanged: (v) => setState(() => _age = v!)),
+              CheckboxListTile(title: const Text('D - Uso de drogas (AINEs/antiplaq.)'), value: _drugs, onChanged: (v) => setState(() => _drugs = v!)),
+              CheckboxListTile(title: const Text('D - Uso de álcool'), value: _alcohol, onChanged: (v) => setState(() => _alcohol = v!)),
+              const SizedBox(height: 24),
+              SaveClearButtons(onSave: _salvar, onClear: _limpar),
+            ],
+          ),
         ),
       ),
     );
@@ -400,23 +413,26 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Wells - TEP'), centerTitle: true),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ScoreDisplay(score: _score.toStringAsFixed(1), classification: _getClassificacao(_score), color: _getColor(_score), subtitle: _getProbabilidade(_score)),
-            const SizedBox(height: 24),
-            ScoreCheckboxOption(label: 'Sinais/sintomas clínicos de TVP', points: '+3', value: _dvtSymptoms, onChanged: (v) => setState(() => _dvtSymptoms = v!)),
-            ScoreCheckboxOption(label: 'TEP é o diagnóstico mais provável', points: '+3', value: _noAlternative, onChanged: (v) => setState(() => _noAlternative = v!)),
-            ScoreCheckboxOption(label: 'FC > 100 bpm', points: '+1.5', value: _hr100, onChanged: (v) => setState(() => _hr100 = v!)),
-            ScoreCheckboxOption(label: 'Imobilização/cirurgia nas últimas 4 sem', points: '+1.5', value: _immobilization, onChanged: (v) => setState(() => _immobilization = v!)),
-            ScoreCheckboxOption(label: 'TVP/TEP prévios', points: '+1.5', value: _previousDvtPe, onChanged: (v) => setState(() => _previousDvtPe = v!)),
-            ScoreCheckboxOption(label: 'Hemoptise', points: '+1', value: _hemoptysis, onChanged: (v) => setState(() => _hemoptysis = v!)),
-            ScoreCheckboxOption(label: 'Malignidade', points: '+1', value: _malignancy, onChanged: (v) => setState(() => _malignancy = v!)),
-            const SizedBox(height: 24),
-            SaveClearButtons(onSave: _salvar, onClear: _limpar),
-          ],
+      body: ResponsiveContent(
+        maxWidth: 600,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ScoreDisplay(score: _score.toStringAsFixed(1), classification: _getClassificacao(_score), color: _getColor(_score), subtitle: _getProbabilidade(_score)),
+              const SizedBox(height: 24),
+              ScoreCheckboxOption(label: 'Sinais/sintomas clínicos de TVP', points: '+3', value: _dvtSymptoms, onChanged: (v) => setState(() => _dvtSymptoms = v!)),
+              ScoreCheckboxOption(label: 'TEP é o diagnóstico mais provável', points: '+3', value: _noAlternative, onChanged: (v) => setState(() => _noAlternative = v!)),
+              ScoreCheckboxOption(label: 'FC > 100 bpm', points: '+1.5', value: _hr100, onChanged: (v) => setState(() => _hr100 = v!)),
+              ScoreCheckboxOption(label: 'Imobilização/cirurgia nas últimas 4 sem', points: '+1.5', value: _immobilization, onChanged: (v) => setState(() => _immobilization = v!)),
+              ScoreCheckboxOption(label: 'TVP/TEP prévios', points: '+1.5', value: _previousDvtPe, onChanged: (v) => setState(() => _previousDvtPe = v!)),
+              ScoreCheckboxOption(label: 'Hemoptise', points: '+1', value: _hemoptysis, onChanged: (v) => setState(() => _hemoptysis = v!)),
+              ScoreCheckboxOption(label: 'Malignidade', points: '+1', value: _malignancy, onChanged: (v) => setState(() => _malignancy = v!)),
+              const SizedBox(height: 24),
+              SaveClearButtons(onSave: _salvar, onClear: _limpar),
+            ],
+          ),
         ),
       ),
     );

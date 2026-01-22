@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../data/store/calculation_store.dart';
 import '../../../shared/shared.dart';
+import '../../../shared/widgets/responsive_layout.dart';
 
 class CreatinineClearanceScreen extends StatefulWidget {
   const CreatinineClearanceScreen({super.key});
@@ -135,71 +136,74 @@ class _CreatinineClearanceScreenState extends State<CreatinineClearanceScreen> {
         title: const Text('Clearance de Creatinina'),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Icon(
-              Icons.water_drop_outlined,
-              size: 80,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Fórmula de Cockcroft-Gault',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Estimativa da Taxa de Filtração Glomerular',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            AppTextField(
-              controller: _idadeController,
-              labelText: AppStrings.idadeAnos,
-              hintText: 'Ex: 45',
-              prefixIcon: Icons.cake_outlined,
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 16),
-            AppTextField(
-              controller: _pesoController,
-              labelText: AppStrings.pesoKg,
-              hintText: 'Ex: 70',
-              prefixIcon: Icons.fitness_center,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            ),
-            const SizedBox(height: 16),
-            AppTextField(
-              controller: _creatininaController,
-              labelText: 'Creatinina Sérica (mg/dL)',
-              hintText: 'Ex: 1.2',
-              prefixIcon: Icons.science_outlined,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            ),
-            const SizedBox(height: 16),
-            _buildSexSelector(),
-            const SizedBox(height: 24),
-            CalculateButtons(onCalculate: _calcularClearance, onClear: _limpar),
-            if (_clearance != null) ...[
-              const SizedBox(height: 32),
-              ResultCard(
-                title: 'Clearance de Creatinina',
-                value: _clearance!.toStringAsFixed(1),
-                unit: 'mL/min',
-                classification: _classificacao,
-                color: _classificacaoColor,
+      body: ResponsiveContent(
+        maxWidth: 600,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Icon(
+                Icons.water_drop_outlined,
+                size: 80,
+                color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(height: 24),
-              _buildClearanceTable(),
+              Text(
+                'Fórmula de Cockcroft-Gault',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Estimativa da Taxa de Filtração Glomerular',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              AppTextField(
+                controller: _idadeController,
+                labelText: AppStrings.idadeAnos,
+                hintText: 'Ex: 45',
+                prefixIcon: Icons.cake_outlined,
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _pesoController,
+                labelText: AppStrings.pesoKg,
+                hintText: 'Ex: 70',
+                prefixIcon: Icons.fitness_center,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _creatininaController,
+                labelText: 'Creatinina Sérica (mg/dL)',
+                hintText: 'Ex: 1.2',
+                prefixIcon: Icons.science_outlined,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
+              const SizedBox(height: 16),
+              _buildSexSelector(),
+              const SizedBox(height: 24),
+              CalculateButtons(onCalculate: _calcularClearance, onClear: _limpar),
+              if (_clearance != null) ...[
+                const SizedBox(height: 32),
+                ResultCard(
+                  title: 'Clearance de Creatinina',
+                  value: _clearance!.toStringAsFixed(1),
+                  unit: 'mL/min',
+                  classification: _classificacao,
+                  color: _classificacaoColor,
+                ),
+                const SizedBox(height: 24),
+                _buildClearanceTable(),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
