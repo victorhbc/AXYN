@@ -338,9 +338,9 @@ class _CalculosSectionState extends State<CalculosSection> {
         _selectedItem = item;
       });
     } else {
-      // In single view, navigate to new page
-      Navigator.push(
-        context,
+      // In single view, navigate to new page using root navigator
+      // This hides the bottom navigation bar
+      Navigator.of(context, rootNavigator: true).push(
         MaterialPageRoute(builder: (context) => item.page!),
       );
     }
