@@ -24,7 +24,8 @@ class _DosePorPesoScreenState extends State<DosePorPesoScreen> {
     if (_store.sharedPeso.isNotEmpty) _pesoController.text = _store.sharedPeso;
     final values = _store.getFormValues('dose_peso');
     if (values != null) {
-      if (values['peso']?.isNotEmpty == true) _pesoController.text = values['peso'];
+      if (values['peso']?.isNotEmpty == true)
+        _pesoController.text = values['peso'];
       _doseController.text = values['dose'] ?? '';
       _resultado = values['resultado'];
     }
@@ -35,7 +36,10 @@ class _DosePorPesoScreenState extends State<DosePorPesoScreen> {
     final doseMgKg = double.tryParse(_doseController.text.replaceAll(',', '.'));
     if (peso == null || doseMgKg == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, insira valores válidos'), backgroundColor: Colors.red),
+        const SnackBar(
+          content: Text('Por favor, insira valores válidos'),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
@@ -43,7 +47,11 @@ class _DosePorPesoScreenState extends State<DosePorPesoScreen> {
     setState(() => _resultado = resultado);
     _store.setResult('dose_peso', resultado, classification: 'Calculado');
     _store.setSharedPeso(_pesoController.text);
-    _store.setFormValues('dose_peso', {'peso': _pesoController.text, 'dose': _doseController.text, 'resultado': _resultado});
+    _store.setFormValues('dose_peso', {
+      'peso': _pesoController.text,
+      'dose': _doseController.text,
+      'resultado': _resultado,
+    });
   }
 
   void _limpar() {
@@ -74,18 +82,49 @@ class _DosePorPesoScreenState extends State<DosePorPesoScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Icon(Icons.medication_outlined, size: 80, color: Theme.of(context).colorScheme.primary),
+              Icon(
+                Icons.medication_outlined,
+                size: 80,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               const SizedBox(height: 24),
-              Text('Cálculo de Dose', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+              Text(
+                'Cálculo de Dose',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 32),
-              AppTextField(controller: _pesoController, labelText: 'Peso (kg)', hintText: 'Ex: 70', prefixIcon: Icons.fitness_center, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+              AppTextField(
+                controller: _pesoController,
+                labelText: 'Peso (kg)',
+                hintText: 'Ex: 70',
+                prefixIcon: Icons.fitness_center,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+              ),
               const SizedBox(height: 16),
-              AppTextField(controller: _doseController, labelText: 'Dose (mg/kg)', hintText: 'Ex: 10', prefixIcon: Icons.science_outlined, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+              AppTextField(
+                controller: _doseController,
+                labelText: 'Dose (mg/kg)',
+                hintText: 'Ex: 10',
+                prefixIcon: Icons.science_outlined,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+              ),
               const SizedBox(height: 24),
               CalculateButtons(onCalculate: _calcular, onClear: _limpar),
               if (_resultado != null) ...[
                 const SizedBox(height: 32),
-                ResultCard(title: 'Dose Total', value: _resultado!.toStringAsFixed(1), unit: 'mg', color: Colors.blue),
+                ResultCard(
+                  title: 'Dose Total',
+                  value: _resultado!.toStringAsFixed(1),
+                  unit: 'mg',
+                  color: Colors.blue,
+                ),
               ],
             ],
           ),
@@ -105,7 +144,7 @@ class GlasgowScreen extends StatefulWidget {
 
 class _GlasgowScreenState extends State<GlasgowScreen> {
   final _store = CalculationStore();
-  int _ocular = 0, _verbal = 0, _motor = 0;
+  int _ocular = 0, _verbal = 0, _motor = 0, _pupil = 0;
 
   @override
   void initState() {
@@ -115,32 +154,41 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
       _ocular = values['ocular'] ?? 0;
       _verbal = values['verbal'] ?? 0;
       _motor = values['motor'] ?? 0;
+      _pupil = values['pupil'] ?? 0;
     }
   }
 
   int get _total => _ocular + _verbal + _motor;
-  
+
+  // GCS-P (Glasgow Coma Scale - Pupils) = GCS Score - Pupil Reactivity Score
+  // Pupil Reactivity Score: 0 = both reactive, 1 = one not reactive, 2 = both not reactive
+  int get _gcsP {
+    if (_total == 0) return 0;
+    final result = _total - _pupil;
+    return result.clamp(1, 15);
+  }
+
   String _getClassificacao(int score) {
     if (score >= 13) return 'TCE Leve';
     if (score >= 9) return 'TCE Moderado';
     if (score >= 3) return 'TCE Grave';
     return 'Sem resposta';
   }
-  
+
   Color _getColor(int score) {
     if (score >= 13) return Colors.green;
     if (score >= 9) return Colors.orange;
     if (score >= 3) return Colors.red;
     return Colors.red.shade900;
   }
-  
+
   String _getSeveridade(int score) {
     if (score >= 13) return 'Leve (13-15)';
     if (score >= 9) return 'Moderado (9-12)';
     if (score >= 3) return 'Grave (3-8)';
     return 'Sem resposta';
   }
-  
+
   String _getPrognostico(int score) {
     if (score >= 13) {
       return 'Bom prognóstico. Monitoramento ambulatorial geralmente adequado.';
@@ -154,14 +202,30 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
 
   void _salvar() {
     if (_total > 0) {
-      _store.setResult('glasgow', _total.toDouble(), classification: _getClassificacao(_total));
-      _store.setFormValues('glasgow', {'ocular': _ocular, 'verbal': _verbal, 'motor': _motor});
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Resultado salvo'), duration: Duration(seconds: 1)));
+      _store.setResult(
+        'glasgow',
+        _total.toDouble(),
+        classification: _getClassificacao(_total),
+      );
+      _store.setFormValues('glasgow', {
+        'ocular': _ocular,
+        'verbal': _verbal,
+        'motor': _motor,
+        'pupil': _pupil,
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Resultado salvo'),
+          duration: Duration(seconds: 1),
+        ),
+      );
     }
   }
 
   void _limpar() {
-    setState(() { _ocular = _verbal = _motor = 0; });
+    setState(() {
+      _ocular = _verbal = _motor = _pupil = 0;
+    });
     _store.clearFormValues('glasgow');
     _store.clearResult('glasgow');
   }
@@ -179,10 +243,14 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
             children: [
               if (_total > 0) ...[
                 ScoreDisplay(
-                  score: '$_total',
-                  classification: _getClassificacao(_total),
-                  color: _getColor(_total),
-                  subtitle: '${_getSeveridade(_total)}\n${_getPrognostico(_total)}',
+                  score: _pupil > 0 ? '$_gcsP' : '$_total',
+                  classification: _pupil > 0
+                      ? _getClassificacao(_gcsP)
+                      : _getClassificacao(_total),
+                  color: _pupil > 0 ? _getColor(_gcsP) : _getColor(_total),
+                  subtitle: _pupil > 0
+                      ? 'GCS-P: $_gcsP (GCS $_total - Pupil Reactivity $_pupil)\n${_getSeveridade(_gcsP)}\n${_getPrognostico(_gcsP)}'
+                      : '${_getSeveridade(_total)}\n${_getPrognostico(_total)}',
                 ),
                 const SizedBox(height: 16),
                 _buildComponentBreakdown(context),
@@ -200,15 +268,15 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
                       Text(
                         'Escala de Glasgow',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'Selecione as respostas abaixo para calcular o escore',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.grey,
-                            ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -216,31 +284,142 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
                 ),
                 const SizedBox(height: 24),
               ],
-              SectionCard(title: 'Abertura Ocular', children: [
-                _buildRadio('Espontânea', 4, _ocular, (v) => setState(() => _ocular = v!)),
-                _buildRadio('Ao estímulo verbal', 3, _ocular, (v) => setState(() => _ocular = v!)),
-                _buildRadio('Ao estímulo doloroso', 2, _ocular, (v) => setState(() => _ocular = v!)),
-                _buildRadio('Ausente', 1, _ocular, (v) => setState(() => _ocular = v!)),
-              ]),
+              SectionCard(
+                title: 'Abertura Ocular',
+                children: [
+                  _buildRadio(
+                    'Espontânea',
+                    4,
+                    _ocular,
+                    (v) => setState(() => _ocular = v!),
+                  ),
+                  _buildRadio(
+                    'Ao estímulo verbal',
+                    3,
+                    _ocular,
+                    (v) => setState(() => _ocular = v!),
+                  ),
+                  _buildRadio(
+                    'Ao estímulo doloroso',
+                    2,
+                    _ocular,
+                    (v) => setState(() => _ocular = v!),
+                  ),
+                  _buildRadio(
+                    'Ausente',
+                    1,
+                    _ocular,
+                    (v) => setState(() => _ocular = v!),
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
-              SectionCard(title: 'Resposta Verbal', children: [
-                _buildRadio('Orientada', 5, _verbal, (v) => setState(() => _verbal = v!)),
-                _buildRadio('Confusa', 4, _verbal, (v) => setState(() => _verbal = v!)),
-                _buildRadio('Palavras inapropriadas', 3, _verbal, (v) => setState(() => _verbal = v!)),
-                _buildRadio('Sons incompreensíveis', 2, _verbal, (v) => setState(() => _verbal = v!)),
-                _buildRadio('Ausente', 1, _verbal, (v) => setState(() => _verbal = v!)),
-              ]),
+              SectionCard(
+                title: 'Resposta Verbal',
+                children: [
+                  _buildRadio(
+                    'Orientada',
+                    5,
+                    _verbal,
+                    (v) => setState(() => _verbal = v!),
+                  ),
+                  _buildRadio(
+                    'Confusa',
+                    4,
+                    _verbal,
+                    (v) => setState(() => _verbal = v!),
+                  ),
+                  _buildRadio(
+                    'Palavras inapropriadas',
+                    3,
+                    _verbal,
+                    (v) => setState(() => _verbal = v!),
+                  ),
+                  _buildRadio(
+                    'Sons incompreensíveis',
+                    2,
+                    _verbal,
+                    (v) => setState(() => _verbal = v!),
+                  ),
+                  _buildRadio(
+                    'Ausente',
+                    1,
+                    _verbal,
+                    (v) => setState(() => _verbal = v!),
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
-              SectionCard(title: 'Resposta Motora', children: [
-                _buildRadio('Obedece comandos', 6, _motor, (v) => setState(() => _motor = v!)),
-                _buildRadio('Localiza dor', 5, _motor, (v) => setState(() => _motor = v!)),
-                _buildRadio('Movimento de retirada', 4, _motor, (v) => setState(() => _motor = v!)),
-                _buildRadio('Flexão anormal', 3, _motor, (v) => setState(() => _motor = v!)),
-                _buildRadio('Extensão anormal', 2, _motor, (v) => setState(() => _motor = v!)),
-                _buildRadio('Ausente', 1, _motor, (v) => setState(() => _motor = v!)),
-              ]),
+              SectionCard(
+                title: 'Resposta Motora',
+                children: [
+                  _buildRadio(
+                    'Obedece comandos',
+                    6,
+                    _motor,
+                    (v) => setState(() => _motor = v!),
+                  ),
+                  _buildRadio(
+                    'Localiza dor',
+                    5,
+                    _motor,
+                    (v) => setState(() => _motor = v!),
+                  ),
+                  _buildRadio(
+                    'Movimento de retirada',
+                    4,
+                    _motor,
+                    (v) => setState(() => _motor = v!),
+                  ),
+                  _buildRadio(
+                    'Flexão anormal',
+                    3,
+                    _motor,
+                    (v) => setState(() => _motor = v!),
+                  ),
+                  _buildRadio(
+                    'Extensão anormal',
+                    2,
+                    _motor,
+                    (v) => setState(() => _motor = v!),
+                  ),
+                  _buildRadio(
+                    'Ausente',
+                    1,
+                    _motor,
+                    (v) => setState(() => _motor = v!),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SectionCard(
+                title: 'Resposta Pupilar',
+                children: [
+                  _buildRadio(
+                    'Ambas pupilas reativas',
+                    0,
+                    _pupil,
+                    (v) => setState(() => _pupil = v!),
+                  ),
+                  _buildRadio(
+                    'Uma pupila não reativa',
+                    1,
+                    _pupil,
+                    (v) => setState(() => _pupil = v!),
+                  ),
+                  _buildRadio(
+                    'Ambas pupilas não reativas',
+                    2,
+                    _pupil,
+                    (v) => setState(() => _pupil = v!),
+                  ),
+                ],
+              ),
               const SizedBox(height: 24),
-              SaveClearButtons(onSave: _total > 0 ? _salvar : null, onClear: _limpar),
+              SaveClearButtons(
+                onSave: _total > 0 ? _salvar : null,
+                onClear: _limpar,
+              ),
               if (_total > 0) ...[
                 const SizedBox(height: 32),
                 _buildSeverityTable(context),
@@ -253,7 +432,7 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
       ),
     );
   }
-  
+
   Widget _buildComponentBreakdown(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -270,38 +449,46 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
           _buildComponentItem(context, 'Ocular', _ocular, 4),
           _buildComponentItem(context, 'Verbal', _verbal, 5),
           _buildComponentItem(context, 'Motor', _motor, 6),
+          if (_pupil > 0)
+            _buildComponentItem(context, 'Pupila', _pupil, 2, isPupil: true),
         ],
       ),
     );
   }
-  
-  Widget _buildComponentItem(BuildContext context, String label, int value, int max) {
+
+  Widget _buildComponentItem(
+    BuildContext context,
+    String label,
+    int value,
+    int max, {
+    bool isPupil = false,
+  }) {
     return Column(
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: Colors.grey),
         ),
         const SizedBox(height: 4),
         Text(
-          '$value',
+          isPupil ? '-$value' : '$value',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+            fontWeight: FontWeight.bold,
+            color: isPupil ? Colors.red : Theme.of(context).colorScheme.primary,
+          ),
         ),
         Text(
           '/$max',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: Colors.grey),
         ),
       ],
     );
   }
-  
+
   Widget _buildSeverityTable(BuildContext context) {
     return ClassificationTable(
       title: 'Classificação por Escore',
@@ -316,15 +503,11 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
           label: 'TCE Moderado',
           color: Colors.orange,
         ),
-        const TableRowData(
-          value: '3-8',
-          label: 'TCE Grave',
-          color: Colors.red,
-        ),
+        const TableRowData(value: '3-8', label: 'TCE Grave', color: Colors.red),
       ],
     );
   }
-  
+
   Widget _buildDetailsCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -348,9 +531,9 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
               const SizedBox(width: 8),
               Text(
                 'Sobre a Escala de Glasgow',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -362,38 +545,73 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
           const SizedBox(height: 12),
           Text(
             'Componentes:',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
-          _buildDetailItem(context, '• Abertura Ocular (1-4):', 'Avalia a capacidade de abrir os olhos espontaneamente ou em resposta a estímulos.'),
-          _buildDetailItem(context, '• Resposta Verbal (1-5):', 'Avalia a capacidade de comunicação e orientação.'),
-          _buildDetailItem(context, '• Resposta Motora (1-6):', 'Avalia a capacidade de movimento e resposta a comandos ou estímulos.'),
+          _buildDetailItem(
+            context,
+            '• Abertura Ocular (1-4):',
+            'Avalia a capacidade de abrir os olhos espontaneamente ou em resposta a estímulos.',
+          ),
+          _buildDetailItem(
+            context,
+            '• Resposta Verbal (1-5):',
+            'Avalia a capacidade de comunicação e orientação.',
+          ),
+          _buildDetailItem(
+            context,
+            '• Resposta Motora (1-6):',
+            'Avalia a capacidade de movimento e resposta a comandos ou estímulos.',
+          ),
+          _buildDetailItem(
+            context,
+            '• Resposta Pupilar (0-2):',
+            'Avalia a reatividade pupilar à luz. Ambas reativas (0), uma não reativa (1), ambas não reativas (2). O GCS-P é calculado subtraindo o escore pupilar do GCS total.',
+          ),
           const SizedBox(height: 12),
           Text(
             'Interpretação:',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
-          _buildDetailItem(context, '• 13-15 (Leve):', 'Bom prognóstico. Geralmente não requer hospitalização prolongada.'),
-          _buildDetailItem(context, '• 9-12 (Moderado):', 'Prognóstico variável. Requer monitoramento hospitalar e avaliação neurológica seriada.'),
-          _buildDetailItem(context, '• 3-8 (Grave):', 'Prognóstico reservado. Necessita cuidados intensivos e monitoramento neurológico contínuo.'),
+          _buildDetailItem(
+            context,
+            '• 13-15 (Leve):',
+            'Bom prognóstico. Geralmente não requer hospitalização prolongada.',
+          ),
+          _buildDetailItem(
+            context,
+            '• 9-12 (Moderado):',
+            'Prognóstico variável. Requer monitoramento hospitalar e avaliação neurológica seriada.',
+          ),
+          _buildDetailItem(
+            context,
+            '• 3-8 (Grave):',
+            'Prognóstico reservado. Necessita cuidados intensivos e monitoramento neurológico contínuo.',
+          ),
+          const SizedBox(height: 12),
+          _buildDetailItem(
+            context,
+            '• GCS-P (Glasgow Coma Scale - Pupils):',
+            'Versão estendida que incorpora a reatividade pupilar. Calculado como GCS - Escore de Reatividade Pupilar. Valores de 1-15, com valores menores indicando pior prognóstico.',
+          ),
           const SizedBox(height: 12),
           Text(
-            'Nota: O escore deve ser reavaliado seriamente, pois pode mudar rapidamente. A resposta motora é o componente mais preditivo de prognóstico em pacientes com TCE grave.',
+            'Nota: O escore deve ser reavaliado seriamente, pois pode mudar rapidamente. A resposta motora é o componente mais preditivo de prognóstico em pacientes com TCE grave. A combinação do GCS com a reatividade pupilar (GCS-P) fornece melhor predição de desfecho do que qualquer componente isolado.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontStyle: FontStyle.italic,
-                  color: Colors.grey,
-                ),
+              fontStyle: FontStyle.italic,
+              color: Colors.grey,
+            ),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildDetailItem(BuildContext context, String label, String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -402,23 +620,35 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           Expanded(
-            child: Text(
-              text,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildRadio(String label, int value, int groupValue, ValueChanged<int?> onChanged) {
-    return RadioListTile<int>(title: Text(label), secondary: Text('$value', style: const TextStyle(fontWeight: FontWeight.bold)), value: value, groupValue: groupValue, onChanged: onChanged, dense: true);
+  Widget _buildRadio(
+    String label,
+    int value,
+    int groupValue,
+    ValueChanged<int?> onChanged,
+  ) {
+    return RadioListTile<int>(
+      title: Text(label),
+      secondary: Text(
+        '$value',
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      value: value,
+      groupValue: groupValue,
+      onChanged: onChanged,
+      dense: true,
+    );
   }
 }
 
@@ -432,8 +662,9 @@ class Cha2ds2VaScreen extends StatefulWidget {
 
 class _Cha2ds2VaScreenState extends State<Cha2ds2VaScreen> {
   final _store = CalculationStore();
-  bool _chf = false, _hypertension = false, _age75 = false, _diabetes = false;
-  bool _stroke = false, _vascular = false, _age65 = false;
+  bool _chf = false, _hypertension = false, _diabetes = false;
+  bool _stroke = false, _vascular = false;
+  int _ageCategory = -1; // -1 = not selected, 0 = under 65, 1 = 65-74, 2 = ≥75
 
   @override
   void initState() {
@@ -442,11 +673,12 @@ class _Cha2ds2VaScreenState extends State<Cha2ds2VaScreen> {
     if (values != null) {
       _chf = values['chf'] ?? false;
       _hypertension = values['hypertension'] ?? false;
-      _age75 = values['age75'] ?? false;
       _diabetes = values['diabetes'] ?? false;
       _stroke = values['stroke'] ?? false;
       _vascular = values['vascular'] ?? false;
-      _age65 = values['age65'] ?? false;
+      _ageCategory = values['ageCategory'] != null
+          ? values['ageCategory'] as int
+          : -1;
     }
   }
 
@@ -454,11 +686,12 @@ class _Cha2ds2VaScreenState extends State<Cha2ds2VaScreen> {
     int s = 0;
     if (_chf) s += 1;
     if (_hypertension) s += 1;
-    if (_age75) s += 2;
     if (_diabetes) s += 1;
     if (_stroke) s += 2;
     if (_vascular) s += 1;
-    if (_age65) s += 1;
+    // Age points: 0 = under 65 (0 points), 1 = 65-74 (1 point), 2 = ≥75 (2 points)
+    if (_ageCategory == 1) s += 1;
+    if (_ageCategory == 2) s += 2;
     return s;
   }
 
@@ -506,13 +739,32 @@ class _Cha2ds2VaScreenState extends State<Cha2ds2VaScreen> {
   }
 
   void _salvar() {
-    _store.setResult('cha2ds2va', _score.toDouble(), classification: _getClassificacao(_score));
-    _store.setFormValues('cha2ds2va', {'chf': _chf, 'hypertension': _hypertension, 'age75': _age75, 'diabetes': _diabetes, 'stroke': _stroke, 'vascular': _vascular, 'age65': _age65});
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Resultado salvo'), duration: Duration(seconds: 1)));
+    _store.setResult(
+      'cha2ds2va',
+      _score.toDouble(),
+      classification: _getClassificacao(_score),
+    );
+    _store.setFormValues('cha2ds2va', {
+      'chf': _chf,
+      'hypertension': _hypertension,
+      'diabetes': _diabetes,
+      'stroke': _stroke,
+      'vascular': _vascular,
+      'ageCategory': _ageCategory,
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Resultado salvo'),
+        duration: Duration(seconds: 1),
+      ),
+    );
   }
 
   void _limpar() {
-    setState(() { _chf = _hypertension = _age75 = _diabetes = _stroke = _vascular = _age65 = false; });
+    setState(() {
+      _chf = _hypertension = _diabetes = _stroke = _vascular = false;
+      _ageCategory = -1;
+    });
     _store.clearFormValues('cha2ds2va');
     _store.clearResult('cha2ds2va');
   }
@@ -521,7 +773,7 @@ class _Cha2ds2VaScreenState extends State<Cha2ds2VaScreen> {
   Widget build(BuildContext context) {
     final annualRisk = _getAnnualStrokeRisk(_score);
     final riskPercentage = annualRisk.toStringAsFixed(1);
-    
+
     return Scaffold(
       appBar: AppBar(title: const Text('CHA₂DS₂-VA'), centerTitle: true),
       body: ResponsiveContent(
@@ -535,16 +787,73 @@ class _Cha2ds2VaScreenState extends State<Cha2ds2VaScreen> {
                 score: '$_score',
                 classification: _getClassificacao(_score),
                 color: _getColor(_score),
-                subtitle: 'Risco anual de AVC: $riskPercentage%\n${_getRecomendacao(_score)}',
+                subtitle:
+                    'Risco anual de AVC: $riskPercentage%\n${_getRecomendacao(_score)}',
+              ),
+              const SizedBox(height: 16),
+              SectionCard(
+                title: 'Idade',
+                children: [
+                  ScoreRadioOption<int>(
+                    label: 'Menor que 65 anos',
+                    value: 0,
+                    groupValue: _ageCategory,
+                    onChanged: (v) {
+                      if (v != null) setState(() => _ageCategory = v);
+                    },
+                    points: 0,
+                  ),
+                  ScoreRadioOption<int>(
+                    label: '65 a 74 anos',
+                    value: 1,
+                    groupValue: _ageCategory,
+                    onChanged: (v) {
+                      if (v != null) setState(() => _ageCategory = v);
+                    },
+                    points: 1,
+                  ),
+                  ScoreRadioOption<int>(
+                    label: '≥ 75 anos',
+                    value: 2,
+                    groupValue: _ageCategory,
+                    onChanged: (v) {
+                      if (v != null) setState(() => _ageCategory = v);
+                    },
+                    points: 2,
+                  ),
+                ],
               ),
               const SizedBox(height: 24),
-              ScoreCheckboxOption(label: 'C - Insuficiência cardíaca', points: '+1', value: _chf, onChanged: (v) => setState(() => _chf = v!)),
-              ScoreCheckboxOption(label: 'H - Hipertensão', points: '+1', value: _hypertension, onChanged: (v) => setState(() => _hypertension = v!)),
-              ScoreCheckboxOption(label: 'A₂ - Idade ≥ 75 anos', points: '+2', value: _age75, onChanged: (v) => setState(() => _age75 = v!)),
-              ScoreCheckboxOption(label: 'D - Diabetes mellitus', points: '+1', value: _diabetes, onChanged: (v) => setState(() => _diabetes = v!)),
-              ScoreCheckboxOption(label: 'S₂ - AVC/AIT/Tromboembolismo', points: '+2', value: _stroke, onChanged: (v) => setState(() => _stroke = v!)),
-              ScoreCheckboxOption(label: 'V - Doença vascular', points: '+1', value: _vascular, onChanged: (v) => setState(() => _vascular = v!)),
-              ScoreCheckboxOption(label: 'A - Idade 65-74 anos', points: '+1', value: _age65, onChanged: (v) => setState(() => _age65 = v!)),
+              ScoreCheckboxOption(
+                label: 'C - Insuficiência cardíaca',
+                points: '+1',
+                value: _chf,
+                onChanged: (v) => setState(() => _chf = v!),
+              ),
+              ScoreCheckboxOption(
+                label: 'H - Hipertensão',
+                points: '+1',
+                value: _hypertension,
+                onChanged: (v) => setState(() => _hypertension = v!),
+              ),
+              ScoreCheckboxOption(
+                label: 'D - Diabetes mellitus',
+                points: '+1',
+                value: _diabetes,
+                onChanged: (v) => setState(() => _diabetes = v!),
+              ),
+              ScoreCheckboxOption(
+                label: 'S₂ - AVC/AIT/Tromboembolismo',
+                points: '+2',
+                value: _stroke,
+                onChanged: (v) => setState(() => _stroke = v!),
+              ),
+              ScoreCheckboxOption(
+                label: 'V - Doença vascular',
+                points: '+1',
+                value: _vascular,
+                onChanged: (v) => setState(() => _vascular = v!),
+              ),
               const SizedBox(height: 24),
               SaveClearButtons(onSave: _salvar, onClear: _limpar),
               const SizedBox(height: 32),
@@ -634,9 +943,9 @@ class _Cha2ds2VaScreenState extends State<Cha2ds2VaScreen> {
               const SizedBox(width: 8),
               Text(
                 'Sobre o CHA₂DS₂-VA',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -648,21 +957,33 @@ class _Cha2ds2VaScreenState extends State<Cha2ds2VaScreen> {
           const SizedBox(height: 12),
           Text(
             'Interpretação:',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
-          _buildDetailItem(context, '• Escore 0:', 'Risco muito baixo. Anticoagulação não recomendada.'),
-          _buildDetailItem(context, '• Escore 1:', 'Risco baixo. Considerar anticoagulação baseado em fatores individuais.'),
-          _buildDetailItem(context, '• Escore ≥2:', 'Risco aumentado. Anticoagulação geralmente recomendada (risco >2% ao ano).'),
+          _buildDetailItem(
+            context,
+            '• Escore 0:',
+            'Risco muito baixo. Anticoagulação não recomendada.',
+          ),
+          _buildDetailItem(
+            context,
+            '• Escore 1:',
+            'Risco baixo. Considerar anticoagulação baseado em fatores individuais.',
+          ),
+          _buildDetailItem(
+            context,
+            '• Escore ≥2:',
+            'Risco aumentado. Anticoagulação geralmente recomendada (risco >2% ao ano).',
+          ),
           const SizedBox(height: 12),
           Text(
             'Nota: Este escore é uma ferramenta de auxílio à decisão clínica. A decisão final sobre anticoagulação deve considerar fatores individuais do paciente, incluindo risco de sangramento (HAS-BLED).',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontStyle: FontStyle.italic,
-                  color: Colors.grey,
-                ),
+              fontStyle: FontStyle.italic,
+              color: Colors.grey,
+            ),
           ),
         ],
       ),
@@ -677,15 +998,12 @@ class _Cha2ds2VaScreenState extends State<Cha2ds2VaScreen> {
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           Expanded(
-            child: Text(
-              text,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
           ),
         ],
       ),
@@ -704,7 +1022,11 @@ class HasBledScreen extends StatefulWidget {
 class _HasBledScreenState extends State<HasBledScreen> {
   final _store = CalculationStore();
   bool _hypertension = false, _renal = false, _liver = false, _stroke = false;
-  bool _bleeding = false, _labile = false, _age = false, _drugs = false, _alcohol = false;
+  bool _bleeding = false,
+      _labile = false,
+      _age = false,
+      _drugs = false,
+      _alcohol = false;
 
   @override
   void initState() {
@@ -723,33 +1045,37 @@ class _HasBledScreenState extends State<HasBledScreen> {
     }
   }
 
-  int get _score => [_hypertension, _renal, _liver, _stroke, _bleeding, _labile, _age, _drugs, _alcohol].where((v) => v).length;
-  
+  int get _score => [
+    _hypertension,
+    _renal,
+    _liver,
+    _stroke,
+    _bleeding,
+    _labile,
+    _age,
+    _drugs,
+    _alcohol,
+  ].where((v) => v).length;
+
   /// Returns the annual major bleeding risk percentage based on HAS-BLED score
   double _getAnnualBleedingRisk(int score) {
-    const riskMap = {
-      0: 1.13,
-      1: 1.02,
-      2: 1.88,
-      3: 3.74,
-      4: 8.70,
-    };
+    const riskMap = {0: 1.13, 1: 1.02, 2: 1.88, 3: 3.74, 4: 8.70};
     // For scores 5-9, use the highest known risk (score 4) as estimate
     return riskMap[score.clamp(0, 4)] ?? 8.70;
   }
-  
+
   String _getClassificacao(int score) {
     if (score <= 1) return 'Baixo risco';
     if (score == 2) return 'Risco moderado';
     return 'Alto risco';
   }
-  
+
   Color _getColor(int score) {
     if (score <= 1) return Colors.green;
     if (score == 2) return Colors.orange;
     return Colors.red;
   }
-  
+
   String _getRecomendacao(int score) {
     if (score <= 1) {
       return 'Risco aceitável de sangramento. Anticoagulação geralmente segura.';
@@ -761,13 +1087,35 @@ class _HasBledScreenState extends State<HasBledScreen> {
   }
 
   void _salvar() {
-    _store.setResult('hasbled', _score.toDouble(), classification: _getClassificacao(_score));
-    _store.setFormValues('hasbled', {'hypertension': _hypertension, 'renal': _renal, 'liver': _liver, 'stroke': _stroke, 'bleeding': _bleeding, 'labile': _labile, 'age': _age, 'drugs': _drugs, 'alcohol': _alcohol});
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Resultado salvo'), duration: Duration(seconds: 1)));
+    _store.setResult(
+      'hasbled',
+      _score.toDouble(),
+      classification: _getClassificacao(_score),
+    );
+    _store.setFormValues('hasbled', {
+      'hypertension': _hypertension,
+      'renal': _renal,
+      'liver': _liver,
+      'stroke': _stroke,
+      'bleeding': _bleeding,
+      'labile': _labile,
+      'age': _age,
+      'drugs': _drugs,
+      'alcohol': _alcohol,
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Resultado salvo'),
+        duration: Duration(seconds: 1),
+      ),
+    );
   }
 
   void _limpar() {
-    setState(() { _hypertension = _renal = _liver = _stroke = _bleeding = _labile = _age = _drugs = _alcohol = false; });
+    setState(() {
+      _hypertension = _renal = _liver = _stroke = _bleeding = _labile = _age =
+          _drugs = _alcohol = false;
+    });
     _store.clearFormValues('hasbled');
     _store.clearResult('hasbled');
   }
@@ -787,7 +1135,8 @@ class _HasBledScreenState extends State<HasBledScreen> {
                 score: '$_score',
                 classification: _getClassificacao(_score),
                 color: _getColor(_score),
-                subtitle: 'Risco anual de sangramento: ${_getAnnualBleedingRisk(_score).toStringAsFixed(2)}%\n${_getRecomendacao(_score)}',
+                subtitle:
+                    'Risco anual de sangramento: ${_getAnnualBleedingRisk(_score).toStringAsFixed(2)}%\n${_getRecomendacao(_score)}',
               ),
               const SizedBox(height: 24),
               ScoreCheckboxOption(
@@ -856,7 +1205,7 @@ class _HasBledScreenState extends State<HasBledScreen> {
       ),
     );
   }
-  
+
   Widget _buildRiskTable(BuildContext context) {
     return ClassificationTable(
       title: 'Risco Anual de Sangramento por Escore',
@@ -894,7 +1243,7 @@ class _HasBledScreenState extends State<HasBledScreen> {
       ],
     );
   }
-  
+
   Widget _buildDetailsCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -918,9 +1267,9 @@ class _HasBledScreenState extends State<HasBledScreen> {
               const SizedBox(width: 8),
               Text(
                 'Sobre o HAS-BLED',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -932,42 +1281,78 @@ class _HasBledScreenState extends State<HasBledScreen> {
           const SizedBox(height: 12),
           Text(
             'Componentes:',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
-          _buildDetailItem(context, '• H - Hipertensão:', 'Pressão arterial sistólica não controlada (>160 mmHg).'),
-          _buildDetailItem(context, '• A - Função anormal:', 'Função renal ou hepática anormal (cada uma conta 1 ponto).'),
-          _buildDetailItem(context, '• S - AVC prévio:', 'História prévia de acidente vascular cerebral.'),
-          _buildDetailItem(context, '• B - Sangramento:', 'História prévia de sangramento ou predisposição.'),
-          _buildDetailItem(context, '• L - INR lábil:', 'INR instável em pacientes em uso de varfarina.'),
+          _buildDetailItem(
+            context,
+            '• H - Hipertensão:',
+            'Pressão arterial sistólica não controlada (>160 mmHg).',
+          ),
+          _buildDetailItem(
+            context,
+            '• A - Função anormal:',
+            'Função renal ou hepática anormal (cada uma conta 1 ponto).',
+          ),
+          _buildDetailItem(
+            context,
+            '• S - AVC prévio:',
+            'História prévia de acidente vascular cerebral.',
+          ),
+          _buildDetailItem(
+            context,
+            '• B - Sangramento:',
+            'História prévia de sangramento ou predisposição.',
+          ),
+          _buildDetailItem(
+            context,
+            '• L - INR lábil:',
+            'INR instável em pacientes em uso de varfarina.',
+          ),
           _buildDetailItem(context, '• E - Idoso:', 'Idade > 65 anos.'),
-          _buildDetailItem(context, '• D - Drogas/Álcool:', 'Uso de AINEs, antiplaquetários ou álcool excessivo.'),
+          _buildDetailItem(
+            context,
+            '• D - Drogas/Álcool:',
+            'Uso de AINEs, antiplaquetários ou álcool excessivo.',
+          ),
           const SizedBox(height: 12),
           Text(
             'Interpretação:',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
-          _buildDetailItem(context, '• 0-1 (Baixo risco):', 'Risco anual ~1%. Anticoagulação geralmente segura.'),
-          _buildDetailItem(context, '• 2 (Moderado):', 'Risco anual ~2%. Monitorar cuidadosamente e modificar fatores de risco.'),
-          _buildDetailItem(context, '• ≥3 (Alto risco):', 'Risco anual ≥3.7%. Revisar necessidade de anticoagulação e corrigir fatores modificáveis.'),
+          _buildDetailItem(
+            context,
+            '• 0-1 (Baixo risco):',
+            'Risco anual ~1%. Anticoagulação geralmente segura.',
+          ),
+          _buildDetailItem(
+            context,
+            '• 2 (Moderado):',
+            'Risco anual ~2%. Monitorar cuidadosamente e modificar fatores de risco.',
+          ),
+          _buildDetailItem(
+            context,
+            '• ≥3 (Alto risco):',
+            'Risco anual ≥3.7%. Revisar necessidade de anticoagulação e corrigir fatores modificáveis.',
+          ),
           const SizedBox(height: 12),
           Text(
             'Nota: O HAS-BLED não deve ser usado para contraindicar anticoagulação, mas sim para identificar e corrigir fatores de risco modificáveis. O benefício da anticoagulação (CHA₂DS₂-VA) deve ser balanceado com o risco de sangramento (HAS-BLED).',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontStyle: FontStyle.italic,
-                  color: Colors.grey,
-                ),
+              fontStyle: FontStyle.italic,
+              color: Colors.grey,
+            ),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildDetailItem(BuildContext context, String label, String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -976,15 +1361,12 @@ class _HasBledScreenState extends State<HasBledScreen> {
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           Expanded(
-            child: Text(
-              text,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
           ),
         ],
       ),
@@ -1003,7 +1385,10 @@ class WellsTepScreen extends StatefulWidget {
 class _WellsTepScreenState extends State<WellsTepScreen> {
   final _store = CalculationStore();
   bool _dvtSymptoms = false, _noAlternative = false, _hr100 = false;
-  bool _immobilization = false, _previousDvtPe = false, _hemoptysis = false, _malignancy = false;
+  bool _immobilization = false,
+      _previousDvtPe = false,
+      _hemoptysis = false,
+      _malignancy = false;
 
   @override
   void initState() {
@@ -1039,25 +1424,25 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
     if (score <= 6) return 20.5;
     return 66.7;
   }
-  
+
   String _getClassificacao(double score) {
     if (score <= 1) return 'Baixa probabilidade';
     if (score <= 4) return 'Baixa probabilidade';
     if (score <= 6) return 'Probabilidade moderada';
     return 'Alta probabilidade';
   }
-  
+
   Color _getColor(double score) {
     if (score <= 4) return Colors.green;
     if (score <= 6) return Colors.orange;
     return Colors.red;
   }
-  
+
   String _getProbabilidade(double score) {
     final prob = _getPEProbability(score);
     return 'Probabilidade de TEP: ${prob.toStringAsFixed(1)}%';
   }
-  
+
   String _getRecomendacao(double score) {
     if (score <= 4) {
       return 'TEP improvável. Considerar D-dímero. Se negativo, TEP pode ser excluído.';
@@ -1069,13 +1454,33 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
   }
 
   void _salvar() {
-    _store.setResult('wells_tep', _score, classification: _getClassificacao(_score));
-    _store.setFormValues('wells_tep', {'dvtSymptoms': _dvtSymptoms, 'noAlternative': _noAlternative, 'hr100': _hr100, 'immobilization': _immobilization, 'previousDvtPe': _previousDvtPe, 'hemoptysis': _hemoptysis, 'malignancy': _malignancy});
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Resultado salvo'), duration: Duration(seconds: 1)));
+    _store.setResult(
+      'wells_tep',
+      _score,
+      classification: _getClassificacao(_score),
+    );
+    _store.setFormValues('wells_tep', {
+      'dvtSymptoms': _dvtSymptoms,
+      'noAlternative': _noAlternative,
+      'hr100': _hr100,
+      'immobilization': _immobilization,
+      'previousDvtPe': _previousDvtPe,
+      'hemoptysis': _hemoptysis,
+      'malignancy': _malignancy,
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Resultado salvo'),
+        duration: Duration(seconds: 1),
+      ),
+    );
   }
 
   void _limpar() {
-    setState(() { _dvtSymptoms = _noAlternative = _hr100 = _immobilization = _previousDvtPe = _hemoptysis = _malignancy = false; });
+    setState(() {
+      _dvtSymptoms = _noAlternative = _hr100 = _immobilization =
+          _previousDvtPe = _hemoptysis = _malignancy = false;
+    });
     _store.clearFormValues('wells_tep');
     _store.clearResult('wells_tep');
   }
@@ -1095,16 +1500,52 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
                 score: _score.toStringAsFixed(1),
                 classification: _getClassificacao(_score),
                 color: _getColor(_score),
-                subtitle: '${_getProbabilidade(_score)}\n${_getRecomendacao(_score)}',
+                subtitle:
+                    '${_getProbabilidade(_score)}\n${_getRecomendacao(_score)}',
               ),
               const SizedBox(height: 24),
-              ScoreCheckboxOption(label: 'Sinais/sintomas clínicos de TVP', points: '+3', value: _dvtSymptoms, onChanged: (v) => setState(() => _dvtSymptoms = v!)),
-              ScoreCheckboxOption(label: 'TEP é o diagnóstico mais provável', points: '+3', value: _noAlternative, onChanged: (v) => setState(() => _noAlternative = v!)),
-              ScoreCheckboxOption(label: 'FC > 100 bpm', points: '+1.5', value: _hr100, onChanged: (v) => setState(() => _hr100 = v!)),
-              ScoreCheckboxOption(label: 'Imobilização/cirurgia nas últimas 4 sem', points: '+1.5', value: _immobilization, onChanged: (v) => setState(() => _immobilization = v!)),
-              ScoreCheckboxOption(label: 'TVP/TEP prévios', points: '+1.5', value: _previousDvtPe, onChanged: (v) => setState(() => _previousDvtPe = v!)),
-              ScoreCheckboxOption(label: 'Hemoptise', points: '+1', value: _hemoptysis, onChanged: (v) => setState(() => _hemoptysis = v!)),
-              ScoreCheckboxOption(label: 'Malignidade', points: '+1', value: _malignancy, onChanged: (v) => setState(() => _malignancy = v!)),
+              ScoreCheckboxOption(
+                label: 'Sinais/sintomas clínicos de TVP',
+                points: '+3',
+                value: _dvtSymptoms,
+                onChanged: (v) => setState(() => _dvtSymptoms = v!),
+              ),
+              ScoreCheckboxOption(
+                label: 'TEP é o diagnóstico mais provável',
+                points: '+3',
+                value: _noAlternative,
+                onChanged: (v) => setState(() => _noAlternative = v!),
+              ),
+              ScoreCheckboxOption(
+                label: 'FC > 100 bpm',
+                points: '+1.5',
+                value: _hr100,
+                onChanged: (v) => setState(() => _hr100 = v!),
+              ),
+              ScoreCheckboxOption(
+                label: 'Imobilização/cirurgia nas últimas 4 sem',
+                points: '+1.5',
+                value: _immobilization,
+                onChanged: (v) => setState(() => _immobilization = v!),
+              ),
+              ScoreCheckboxOption(
+                label: 'TVP/TEP prévios',
+                points: '+1.5',
+                value: _previousDvtPe,
+                onChanged: (v) => setState(() => _previousDvtPe = v!),
+              ),
+              ScoreCheckboxOption(
+                label: 'Hemoptise',
+                points: '+1',
+                value: _hemoptysis,
+                onChanged: (v) => setState(() => _hemoptysis = v!),
+              ),
+              ScoreCheckboxOption(
+                label: 'Malignidade',
+                points: '+1',
+                value: _malignancy,
+                onChanged: (v) => setState(() => _malignancy = v!),
+              ),
               const SizedBox(height: 24),
               SaveClearButtons(onSave: _salvar, onClear: _limpar),
               const SizedBox(height: 32),
@@ -1117,7 +1558,7 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
       ),
     );
   }
-  
+
   Widget _buildRiskTable(BuildContext context) {
     return ClassificationTable(
       title: 'Probabilidade de TEP por Escore',
@@ -1145,7 +1586,7 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
       ],
     );
   }
-  
+
   Widget _buildDetailsCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -1169,9 +1610,9 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
               const SizedBox(width: 8),
               Text(
                 'Sobre o Escore de Wells para TEP',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -1183,42 +1624,82 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
           const SizedBox(height: 12),
           Text(
             'Componentes:',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
-          _buildDetailItem(context, '• Sinais/sintomas de TVP:', 'Edema ou dor em membro inferior (+3 pontos).'),
-          _buildDetailItem(context, '• TEP mais provável:', 'TEP é o diagnóstico mais provável que alternativas (+3 pontos).'),
-          _buildDetailItem(context, '• FC > 100 bpm:', 'Frequência cardíaca > 100 bpm (+1.5 pontos).'),
-          _buildDetailItem(context, '• Imobilização/cirurgia:', 'Imobilização ≥3 dias ou cirurgia nas últimas 4 semanas (+1.5 pontos).'),
-          _buildDetailItem(context, '• TVP/TEP prévios:', 'História prévia de trombose venosa profunda ou TEP (+1.5 pontos).'),
-          _buildDetailItem(context, '• Hemoptise:', 'Sangramento ao tossir (+1 ponto).'),
-          _buildDetailItem(context, '• Malignidade:', 'Malignidade ativa ou tratamento recente (+1 ponto).'),
+          _buildDetailItem(
+            context,
+            '• Sinais/sintomas de TVP:',
+            'Edema ou dor em membro inferior (+3 pontos).',
+          ),
+          _buildDetailItem(
+            context,
+            '• TEP mais provável:',
+            'TEP é o diagnóstico mais provável que alternativas (+3 pontos).',
+          ),
+          _buildDetailItem(
+            context,
+            '• FC > 100 bpm:',
+            'Frequência cardíaca > 100 bpm (+1.5 pontos).',
+          ),
+          _buildDetailItem(
+            context,
+            '• Imobilização/cirurgia:',
+            'Imobilização ≥3 dias ou cirurgia nas últimas 4 semanas (+1.5 pontos).',
+          ),
+          _buildDetailItem(
+            context,
+            '• TVP/TEP prévios:',
+            'História prévia de trombose venosa profunda ou TEP (+1.5 pontos).',
+          ),
+          _buildDetailItem(
+            context,
+            '• Hemoptise:',
+            'Sangramento ao tossir (+1 ponto).',
+          ),
+          _buildDetailItem(
+            context,
+            '• Malignidade:',
+            'Malignidade ativa ou tratamento recente (+1 ponto).',
+          ),
           const SizedBox(height: 12),
           Text(
             'Interpretação:',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
-          _buildDetailItem(context, '• ≤4 (Baixa probabilidade):', 'Probabilidade ~3.6-5.1%. Considerar D-dímero. Se negativo, TEP pode ser excluído.'),
-          _buildDetailItem(context, '• 4.5-6 (Moderada):', 'Probabilidade ~20.5%. Realizar D-dímero e/ou angio-TC de tórax.'),
-          _buildDetailItem(context, '• >6 (Alta probabilidade):', 'Probabilidade ~66.7%. Realizar angio-TC de tórax imediatamente. Considerar anticoagulação empírica.'),
+          _buildDetailItem(
+            context,
+            '• ≤4 (Baixa probabilidade):',
+            'Probabilidade ~3.6-5.1%. Considerar D-dímero. Se negativo, TEP pode ser excluído.',
+          ),
+          _buildDetailItem(
+            context,
+            '• 4.5-6 (Moderada):',
+            'Probabilidade ~20.5%. Realizar D-dímero e/ou angio-TC de tórax.',
+          ),
+          _buildDetailItem(
+            context,
+            '• >6 (Alta probabilidade):',
+            'Probabilidade ~66.7%. Realizar angio-TC de tórax imediatamente. Considerar anticoagulação empírica.',
+          ),
           const SizedBox(height: 12),
           Text(
             'Nota: O escore de Wells deve ser usado em conjunto com exames complementares (D-dímero, angio-TC). Em pacientes com escore baixo e D-dímero negativo, a probabilidade de TEP é <2%. Em pacientes com escore alto, a investigação deve ser imediata.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontStyle: FontStyle.italic,
-                  color: Colors.grey,
-                ),
+              fontStyle: FontStyle.italic,
+              color: Colors.grey,
+            ),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildDetailItem(BuildContext context, String label, String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -1227,15 +1708,12 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           Expanded(
-            child: Text(
-              text,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
           ),
         ],
       ),
