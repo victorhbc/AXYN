@@ -8,4 +8,14 @@ abstract class AppTheme {
       useMaterial3: true,
     );
   }
+
+  static ThemeData get darkTheme {
+    return ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.blue,
+        brightness: Brightness.dark,
+      ),
+      useMaterial3: true,
+    );
+  }
 }

@@ -8,3 +8,4 @@ export 'router/app_router.dart';
 // Theme
 export 'theme/app_theme.dart';
 export 'theme/classification_colors.dart';
+export 'theme/theme_provider.dart';

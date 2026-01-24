@@ -12,6 +12,7 @@ abstract class AppStrings {
   // Navigation
   static const String calculosTab = 'Cálculos';
   static const String pediatriaTab = 'Pediatria';
+  static const String settingsTab = 'Configurações';
   static const String sobreTab = 'Sobre';
 
   // Common Actions
@@ -44,7 +45,7 @@ abstract class AppStrings {
   static const String dosePesoSubtitle = 'Cálculo de Medicamentos';
   static const String glasgowTitle = 'Glasgow';
   static const String glasgowSubtitle = 'Escala de Coma';
-  static const String cha2ds2Title = 'CHA₂DS₂-VASc';
+  static const String cha2ds2Title = 'CHA₂DS₂-VA';
   static const String cha2ds2Subtitle = 'Risco de AVC';
   static const String hasBledTitle = 'HAS-BLED';
   static const String hasBledSubtitle = 'Risco de Sangramento';

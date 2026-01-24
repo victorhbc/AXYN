@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/calculos/calculos_section.dart';
 import '../../features/pediatria/pediatria_section.dart';
-import '../../features/sobre/sobre_section.dart';
+import '../../features/settings/settings_section.dart';
 import '../../shared/shared.dart';
 import '../constants/app_strings.dart';
 
@@ -12,7 +12,7 @@ import '../constants/app_strings.dart';
 class AppRoutes {
   static const String calculadoras = '/calculadoras';
   static const String pediatria = '/pediatria';
-  static const String sobre = '/sobre';
+  static const String settings = '/configuracoes';
 }
 
 /// Router configuration for the application
@@ -40,9 +40,9 @@ class AppRouter {
             ),
           ),
           GoRoute(
-            path: AppRoutes.sobre,
+            path: AppRoutes.settings,
             pageBuilder: (context, state) => const NoTransitionPage(
-              child: SobreSection(),
+              child: SettingsSection(),
             ),
           ),
         ],
@@ -52,6 +52,10 @@ class AppRouter {
       // Redirect root to calculadoras (default)
       if (state.uri.path == '/') {
         return AppRoutes.calculadoras;
+      }
+      // Redirect old sobre route to settings
+      if (state.uri.path == '/sobre') {
+        return AppRoutes.settings;
       }
       return null;
     },
@@ -66,7 +70,7 @@ class AppRouter {
         return 0;
       case AppRoutes.pediatria:
         return 1;
-      case AppRoutes.sobre:
+      case AppRoutes.settings:
         return 2;
       default:
         return 0;
@@ -81,7 +85,7 @@ class AppRouter {
       case 1:
         return AppRoutes.pediatria;
       case 2:
-        return AppRoutes.sobre;
+        return AppRoutes.settings;
       default:
         return AppRoutes.calculadoras;
     }
@@ -106,9 +110,9 @@ class MainShell extends StatelessWidget {
       label: AppStrings.pediatriaTab,
     ),
     NavigationItem(
-      icon: Icons.info_outline,
-      selectedIcon: Icons.info,
-      label: AppStrings.sobreTab,
+      icon: Icons.settings_outlined,
+      selectedIcon: Icons.settings,
+      label: AppStrings.settingsTab,
     ),
   ];
 

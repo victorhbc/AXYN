@@ -59,8 +59,8 @@ class _CalculosSectionState extends State<CalculosSection> {
       title: AppStrings.cha2ds2Title,
       subtitle: AppStrings.cha2ds2Subtitle,
       icon: Icons.favorite_outlined,
-      page: Cha2ds2VascScreen(),
-      storeKey: 'cha2ds2vasc',
+      page: Cha2ds2VaScreen(),
+      storeKey: 'cha2ds2va',
       resultUnit: 'pts',
     ),
     const CalculoItem(

@@ -422,23 +422,23 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
   }
 }
 
-// ==================== CHA2DS2-VASc ====================
-class Cha2ds2VascScreen extends StatefulWidget {
-  const Cha2ds2VascScreen({super.key});
+// ==================== CHA2DS2-VA ====================
+class Cha2ds2VaScreen extends StatefulWidget {
+  const Cha2ds2VaScreen({super.key});
 
   @override
-  State<Cha2ds2VascScreen> createState() => _Cha2ds2VascScreenState();
+  State<Cha2ds2VaScreen> createState() => _Cha2ds2VaScreenState();
 }
 
-class _Cha2ds2VascScreenState extends State<Cha2ds2VascScreen> {
+class _Cha2ds2VaScreenState extends State<Cha2ds2VaScreen> {
   final _store = CalculationStore();
   bool _chf = false, _hypertension = false, _age75 = false, _diabetes = false;
-  bool _stroke = false, _vascular = false, _age65 = false, _female = false;
+  bool _stroke = false, _vascular = false, _age65 = false;
 
   @override
   void initState() {
     super.initState();
-    final values = _store.getFormValues('cha2ds2vasc');
+    final values = _store.getFormValues('cha2ds2va');
     if (values != null) {
       _chf = values['chf'] ?? false;
       _hypertension = values['hypertension'] ?? false;
@@ -447,7 +447,6 @@ class _Cha2ds2VascScreenState extends State<Cha2ds2VascScreen> {
       _stroke = values['stroke'] ?? false;
       _vascular = values['vascular'] ?? false;
       _age65 = values['age65'] ?? false;
-      _female = values['female'] ?? false;
     }
   }
 
@@ -460,11 +459,10 @@ class _Cha2ds2VascScreenState extends State<Cha2ds2VascScreen> {
     if (_stroke) s += 2;
     if (_vascular) s += 1;
     if (_age65) s += 1;
-    if (_female) s += 1;
     return s;
   }
 
-  /// Returns the annual stroke risk percentage based on CHA2DS2-VASc score
+  /// Returns the annual stroke risk percentage based on CHA2DS2-VA score
   double _getAnnualStrokeRisk(int score) {
     const riskMap = {
       0: 0.2,
@@ -476,9 +474,8 @@ class _Cha2ds2VascScreenState extends State<Cha2ds2VascScreen> {
       6: 9.7,
       7: 11.2,
       8: 10.8,
-      9: 12.2,
     };
-    return riskMap[score.clamp(0, 9)] ?? 12.2;
+    return riskMap[score.clamp(0, 8)] ?? 10.8;
   }
 
   String _getClassificacao(int score) {
@@ -509,15 +506,15 @@ class _Cha2ds2VascScreenState extends State<Cha2ds2VascScreen> {
   }
 
   void _salvar() {
-    _store.setResult('cha2ds2vasc', _score.toDouble(), classification: _getClassificacao(_score));
-    _store.setFormValues('cha2ds2vasc', {'chf': _chf, 'hypertension': _hypertension, 'age75': _age75, 'diabetes': _diabetes, 'stroke': _stroke, 'vascular': _vascular, 'age65': _age65, 'female': _female});
+    _store.setResult('cha2ds2va', _score.toDouble(), classification: _getClassificacao(_score));
+    _store.setFormValues('cha2ds2va', {'chf': _chf, 'hypertension': _hypertension, 'age75': _age75, 'diabetes': _diabetes, 'stroke': _stroke, 'vascular': _vascular, 'age65': _age65});
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Resultado salvo'), duration: Duration(seconds: 1)));
   }
 
   void _limpar() {
-    setState(() { _chf = _hypertension = _age75 = _diabetes = _stroke = _vascular = _age65 = _female = false; });
-    _store.clearFormValues('cha2ds2vasc');
-    _store.clearResult('cha2ds2vasc');
+    setState(() { _chf = _hypertension = _age75 = _diabetes = _stroke = _vascular = _age65 = false; });
+    _store.clearFormValues('cha2ds2va');
+    _store.clearResult('cha2ds2va');
   }
 
   @override
@@ -526,7 +523,7 @@ class _Cha2ds2VascScreenState extends State<Cha2ds2VascScreen> {
     final riskPercentage = annualRisk.toStringAsFixed(1);
     
     return Scaffold(
-      appBar: AppBar(title: const Text('CHA₂DS₂-VASc'), centerTitle: true),
+      appBar: AppBar(title: const Text('CHA₂DS₂-VA'), centerTitle: true),
       body: ResponsiveContent(
         maxWidth: 600,
         child: SingleChildScrollView(
@@ -548,7 +545,6 @@ class _Cha2ds2VascScreenState extends State<Cha2ds2VascScreen> {
               ScoreCheckboxOption(label: 'S₂ - AVC/AIT/Tromboembolismo', points: '+2', value: _stroke, onChanged: (v) => setState(() => _stroke = v!)),
               ScoreCheckboxOption(label: 'V - Doença vascular', points: '+1', value: _vascular, onChanged: (v) => setState(() => _vascular = v!)),
               ScoreCheckboxOption(label: 'A - Idade 65-74 anos', points: '+1', value: _age65, onChanged: (v) => setState(() => _age65 = v!)),
-              ScoreCheckboxOption(label: 'Sc - Sexo feminino', points: '+1', value: _female, onChanged: (v) => setState(() => _female = v!)),
               const SizedBox(height: 24),
               SaveClearButtons(onSave: _salvar, onClear: _limpar),
               const SizedBox(height: 32),
@@ -611,11 +607,6 @@ class _Cha2ds2VascScreenState extends State<Cha2ds2VascScreen> {
           label: '10.8% ao ano',
           color: Colors.red,
         ),
-        const TableRowData(
-          value: 'Escore 9',
-          label: '12.2% ao ano',
-          color: Colors.red,
-        ),
       ],
     );
   }
@@ -642,7 +633,7 @@ class _Cha2ds2VascScreenState extends State<Cha2ds2VascScreen> {
               ),
               const SizedBox(width: 8),
               Text(
-                'Sobre o CHA₂DS₂-VASc',
+                'Sobre o CHA₂DS₂-VA',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -651,7 +642,7 @@ class _Cha2ds2VascScreenState extends State<Cha2ds2VascScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'O escore CHA₂DS₂-VASc estima o risco anual de acidente vascular cerebral (AVC) em pacientes com fibrilação atrial não valvar.',
+            'O escore CHA₂DS₂-VA estima o risco anual de acidente vascular cerebral (AVC) em pacientes com fibrilação atrial não valvar. Esta versão atualizada remove o componente de sexo (Sc) do escore anterior CHA₂DS₂-VASc, baseado em evidências recentes que mostram que o sexo feminino não é um fator de risco independente para AVC.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 12),
@@ -966,7 +957,7 @@ class _HasBledScreenState extends State<HasBledScreen> {
           _buildDetailItem(context, '• ≥3 (Alto risco):', 'Risco anual ≥3.7%. Revisar necessidade de anticoagulação e corrigir fatores modificáveis.'),
           const SizedBox(height: 12),
           Text(
-            'Nota: O HAS-BLED não deve ser usado para contraindicar anticoagulação, mas sim para identificar e corrigir fatores de risco modificáveis. O benefício da anticoagulação (CHA₂DS₂-VASc) deve ser balanceado com o risco de sangramento (HAS-BLED).',
+            'Nota: O HAS-BLED não deve ser usado para contraindicar anticoagulação, mas sim para identificar e corrigir fatores de risco modificáveis. O benefício da anticoagulação (CHA₂DS₂-VA) deve ser balanceado com o risco de sangramento (HAS-BLED).',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   fontStyle: FontStyle.italic,
                   color: Colors.grey,
