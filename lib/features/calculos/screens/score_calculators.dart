@@ -615,7 +615,7 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
   Widget _buildDetailItem(BuildContext context, String label, String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -624,8 +624,12 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
               context,
             ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
-          Expanded(
-            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
+          Padding(
+            padding: const EdgeInsets.only(left: 16, top: 4),
+            child: Text(
+              text,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ),
         ],
       ),
@@ -993,7 +997,7 @@ class _Cha2ds2VaScreenState extends State<Cha2ds2VaScreen> {
   Widget _buildDetailItem(BuildContext context, String label, String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -1002,8 +1006,12 @@ class _Cha2ds2VaScreenState extends State<Cha2ds2VaScreen> {
               context,
             ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
-          Expanded(
-            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
+          Padding(
+            padding: const EdgeInsets.only(left: 16, top: 4),
+            child: Text(
+              text,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ),
         ],
       ),
@@ -1356,7 +1364,7 @@ class _HasBledScreenState extends State<HasBledScreen> {
   Widget _buildDetailItem(BuildContext context, String label, String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -1365,8 +1373,12 @@ class _HasBledScreenState extends State<HasBledScreen> {
               context,
             ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
-          Expanded(
-            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
+          Padding(
+            padding: const EdgeInsets.only(left: 16, top: 4),
+            child: Text(
+              text,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ),
         ],
       ),
@@ -1608,11 +1620,13 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
                 size: 24,
               ),
               const SizedBox(width: 8),
-              Text(
-                'Sobre o Escore de Wells para TEP',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              Expanded(
+                child: Text(
+                  'Sobre o Escore de Wells para TEP',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           ),
@@ -1703,7 +1717,7 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
   Widget _buildDetailItem(BuildContext context, String label, String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -1712,8 +1726,12 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
               context,
             ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
-          Expanded(
-            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
+          Padding(
+            padding: const EdgeInsets.only(left: 16, top: 4),
+            child: Text(
+              text,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ),
         ],
       ),
