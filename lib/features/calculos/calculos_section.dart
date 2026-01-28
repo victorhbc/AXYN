@@ -48,6 +48,14 @@ class _CalculosSectionState extends State<CalculosSection> {
       resultUnit: '',
     ),
     const CalculoItem(
+      title: AppStrings.intubationTitle,
+      subtitle: AppStrings.intubationSubtitle,
+      icon: Icons.airline_stops_outlined,
+      page: IntubationScreen(),
+      storeKey: 'intubation',
+      resultUnit: '',
+    ),
+    const CalculoItem(
       title: AppStrings.glasgowTitle,
       subtitle: AppStrings.glasgowSubtitle,
       icon: Icons.psychology_outlined,

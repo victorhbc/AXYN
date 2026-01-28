@@ -626,10 +626,7 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 16, top: 4),
-            child: Text(
-              text,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
           ),
         ],
       ),
@@ -1008,10 +1005,7 @@ class _Cha2ds2VaScreenState extends State<Cha2ds2VaScreen> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 16, top: 4),
-            child: Text(
-              text,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
           ),
         ],
       ),
@@ -1375,10 +1369,7 @@ class _HasBledScreenState extends State<HasBledScreen> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 16, top: 4),
-            child: Text(
-              text,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
           ),
         ],
       ),
@@ -1623,9 +1614,9 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
               Expanded(
                 child: Text(
                   'Sobre o Escore de Wells para TEP',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -1728,10 +1719,7 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 16, top: 4),
-            child: Text(
-              text,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
           ),
         ],
       ),

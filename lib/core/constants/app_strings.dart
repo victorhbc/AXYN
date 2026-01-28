@@ -57,4 +57,6 @@ abstract class AppStrings {
   static const String osmolaritySubtitle = 'Osmolaridade Plasmática';
   static const String gestationalTitle = 'Idade Gestacional';
   static const String gestationalSubtitle = 'IG e DPP';
+  static const String intubationTitle = 'Intubação';
+  static const String intubationSubtitle = 'Medicações para Intubação';
 }
