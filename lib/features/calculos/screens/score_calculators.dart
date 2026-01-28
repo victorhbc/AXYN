@@ -607,6 +607,10 @@ class _GlasgowScreenState extends State<GlasgowScreen> {
               color: Colors.grey,
             ),
           ),
+          const SizedBox(height: 16),
+          const Divider(),
+          const SizedBox(height: 12),
+          CitationLinkButton(calculatorName: 'Glasgow'),
         ],
       ),
     );
@@ -986,6 +990,10 @@ class _Cha2ds2VaScreenState extends State<Cha2ds2VaScreen> {
               color: Colors.grey,
             ),
           ),
+          const SizedBox(height: 16),
+          const Divider(),
+          const SizedBox(height: 12),
+          CitationLinkButton(calculatorName: 'CHA2DS2-VA'),
         ],
       ),
     );
@@ -1350,6 +1358,10 @@ class _HasBledScreenState extends State<HasBledScreen> {
               color: Colors.grey,
             ),
           ),
+          const SizedBox(height: 16),
+          const Divider(),
+          const SizedBox(height: 12),
+          CitationLinkButton(calculatorName: 'HAS-BLED'),
         ],
       ),
     );
@@ -1700,6 +1712,10 @@ class _WellsTepScreenState extends State<WellsTepScreen> {
               color: Colors.grey,
             ),
           ),
+          const SizedBox(height: 16),
+          const Divider(),
+          const SizedBox(height: 12),
+          CitationLinkButton(calculatorName: 'Wells TEP'),
         ],
       ),
     );

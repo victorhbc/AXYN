@@ -7,6 +7,7 @@ import '../../features/pediatria/pediatria_section.dart';
 import '../../features/settings/settings_section.dart';
 import '../../shared/shared.dart';
 import '../constants/app_strings.dart';
+import '../services/disclaimer_service.dart';
 
 /// Route paths for the application
 class AppRoutes {
@@ -93,11 +94,16 @@ class AppRouter {
 }
 
 /// Main shell widget that provides navigation structure
-class MainShell extends StatelessWidget {
+class MainShell extends StatefulWidget {
   final Widget child;
 
   const MainShell({super.key, required this.child});
 
+  @override
+  State<MainShell> createState() => _MainShellState();
+}
+
+class _MainShellState extends State<MainShell> {
   static const List<NavigationItem> _destinations = [
     NavigationItem(
       icon: Icons.calculate_outlined,
@@ -117,6 +123,22 @@ class MainShell extends StatelessWidget {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // Check and show disclaimer on first launch
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndShowDisclaimer();
+    });
+  }
+
+  Future<void> _checkAndShowDisclaimer() async {
+    final hasSeen = await DisclaimerService.hasSeenDisclaimer();
+    if (!hasSeen && mounted) {
+      await MedicalDisclaimerDialog.show(context, isFirstLaunch: true);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final currentPath = GoRouterState.of(context).uri.path;
     final currentIndex = AppRouter.getIndexFromPath(currentPath);
@@ -127,7 +149,7 @@ class MainShell extends StatelessWidget {
         context.go(AppRouter.getPathFromIndex(index));
       },
       destinations: _destinations,
-      child: child,
+      child: widget.child,
     );
   }
 }
