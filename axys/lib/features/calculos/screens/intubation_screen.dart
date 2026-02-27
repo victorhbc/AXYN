@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart';
-
 import '../../../data/store/calculation_store.dart';
 import '../../../shared/shared.dart';
 import '../data/intubation_drugs.dart';
