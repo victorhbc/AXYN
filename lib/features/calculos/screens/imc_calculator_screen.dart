@@ -179,10 +179,11 @@ class _ImcCalculatorScreenState extends State<ImcCalculatorScreen> {
                 ),
                 const SizedBox(height: 24),
                 _buildImcTable(),
-                const SizedBox(height: 24),
-                const Divider(),
-                const SizedBox(height: 16),
-                CitationLinkButton(calculatorName: 'IMC'),
+                // Citações médicas comentadas para descaracterizar (guidelines)
+                // const SizedBox(height: 24),
+                // const Divider(),
+                // const SizedBox(height: 16),
+                // CitationLinkButton(calculatorName: 'IMC'),
               ],
             ],
           ),
@@ -193,7 +194,7 @@ class _ImcCalculatorScreenState extends State<ImcCalculatorScreen> {
 
   Widget _buildImcTable() {
     return ClassificationTable(
-      title: 'Tabela de Classificação',
+      title: 'Referência (apenas informativo)',
       rows: [
         const TableRowData(value: 'Abaixo de 18.5', label: 'Abaixo do peso', color: Colors.orange),
         const TableRowData(value: '18.5 - 24.9', label: 'Peso normal', color: Colors.green),

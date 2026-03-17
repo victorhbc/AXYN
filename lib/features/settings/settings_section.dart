@@ -5,7 +5,6 @@ import '../../core/theme/theme_provider.dart';
 import '../../shared/shared.dart';
 import '../sobre/data/legal_content.dart';
 import '../sobre/widgets/app_info_card.dart';
-import '../sobre/widgets/citations_section_card.dart';
 import '../sobre/widgets/expandable_section_card.dart';
 
 /// Settings section with app info, dark mode toggle, and legal content
@@ -28,8 +27,9 @@ class SettingsSection extends StatelessWidget {
               const AppInfoCard(),
               const SizedBox(height: 24),
               _buildDarkModeToggle(context, themeProvider),
-              const SizedBox(height: 24),
-              _buildMedicalDisclaimerCard(context),
+              // Temporarily commented for App Store guideline 1.4.1
+              // const SizedBox(height: 24),
+              // _buildMedicalDisclaimerCard(context),
               const SizedBox(height: 24),
               _buildAboutSection(context),
               const SizedBox(height: 24),
@@ -68,29 +68,30 @@ class SettingsSection extends StatelessWidget {
     );
   }
 
-  Widget _buildMedicalDisclaimerCard(BuildContext context) {
-    return Card(
-      color: Theme.of(context).colorScheme.errorContainer.withOpacity(0.3),
-      child: ListTile(
-        leading: Icon(
-          Icons.warning_amber_rounded,
-          color: Theme.of(context).colorScheme.error,
-          size: 32,
-        ),
-        title: const Text(
-          'Aviso Médico',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: const Text(
-          'Leia o aviso médico importante sobre o uso deste aplicativo',
-        ),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () {
-          MedicalDisclaimerDialog.show(context);
-        },
-      ),
-    );
-  }
+  // Temporarily commented for App Store guideline 1.4.1
+  // Widget _buildMedicalDisclaimerCard(BuildContext context) {
+  //   return Card(
+  //     color: Theme.of(context).colorScheme.errorContainer.withOpacity(0.3),
+  //     child: ListTile(
+  //       leading: Icon(
+  //         Icons.warning_amber_rounded,
+  //         color: Theme.of(context).colorScheme.error,
+  //         size: 32,
+  //       ),
+  //       title: const Text(
+  //         'Aviso Médico',
+  //         style: TextStyle(fontWeight: FontWeight.bold),
+  //       ),
+  //       subtitle: const Text(
+  //         'Leia o aviso médico importante sobre o uso deste aplicativo',
+  //       ),
+  //       trailing: const Icon(Icons.chevron_right),
+  //       onTap: () {
+  //         MedicalDisclaimerDialog.show(context);
+  //       },
+  //     ),
+  //   );
+  // }
 
   Widget _buildAboutSection(BuildContext context) {
     return Column(
@@ -121,7 +122,8 @@ class SettingsSection extends StatelessWidget {
           content: LegalContent.legalNotice,
         ),
         const SizedBox(height: 16),
-        const CitationsSectionCard(),
+        // Temporarily commented for App Store guideline 1.4.1 - medical citations
+        // const CitationsSectionCard(),
         const SizedBox(height: 16),
         const ExpandableSectionCard(
           title: 'Referências Gerais',

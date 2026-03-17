@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/calculos/calculos_section.dart';
-import '../../features/pediatria/pediatria_section.dart';
+// Temporarily commented for App Store guidelines (1.4.1, 1.4.2) - medical/dosage features
+// import '../../features/pediatria/pediatria_section.dart';
 import '../../features/settings/settings_section.dart';
 import '../../shared/shared.dart';
 import '../constants/app_strings.dart';
-import '../services/disclaimer_service.dart';
+// import '../services/disclaimer_service.dart';
 
 /// Route paths for the application
 class AppRoutes {
   static const String calculadoras = '/calculadoras';
-  static const String pediatria = '/pediatria';
+  // static const String pediatria = '/pediatria';
   static const String settings = '/configuracoes';
 }
 
@@ -34,12 +35,13 @@ class AppRouter {
               child: CalculosSection(),
             ),
           ),
-          GoRoute(
-            path: AppRoutes.pediatria,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: PediatriaSection(),
-            ),
-          ),
+          // Temporarily commented for App Store guidelines (1.4.2 - dosage calculator)
+          // GoRoute(
+          //   path: AppRoutes.pediatria,
+          //   pageBuilder: (context, state) => const NoTransitionPage(
+          //     child: PediatriaSection(),
+          //   ),
+          // ),
           GoRoute(
             path: AppRoutes.settings,
             pageBuilder: (context, state) => const NoTransitionPage(
@@ -69,10 +71,8 @@ class AppRouter {
     switch (path) {
       case AppRoutes.calculadoras:
         return 0;
-      case AppRoutes.pediatria:
-        return 1;
       case AppRoutes.settings:
-        return 2;
+        return 1;
       default:
         return 0;
     }
@@ -84,8 +84,6 @@ class AppRouter {
       case 0:
         return AppRoutes.calculadoras;
       case 1:
-        return AppRoutes.pediatria;
-      case 2:
         return AppRoutes.settings;
       default:
         return AppRoutes.calculadoras;
@@ -110,11 +108,12 @@ class _MainShellState extends State<MainShell> {
       selectedIcon: Icons.calculate,
       label: AppStrings.calculosTab,
     ),
-    NavigationItem(
-      icon: Icons.medication_outlined,
-      selectedIcon: Icons.medication,
-      label: AppStrings.pediatriaTab,
-    ),
+    // Temporarily commented for App Store guidelines (1.4.2)
+    // NavigationItem(
+    //   icon: Icons.medication_outlined,
+    //   selectedIcon: Icons.medication,
+    //   label: AppStrings.pediatriaTab,
+    // ),
     NavigationItem(
       icon: Icons.settings_outlined,
       selectedIcon: Icons.settings,
@@ -125,18 +124,18 @@ class _MainShellState extends State<MainShell> {
   @override
   void initState() {
     super.initState();
-    // Check and show disclaimer on first launch
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkAndShowDisclaimer();
-    });
+    // Temporarily commented for App Store guidelines (1.4.1) - medical disclaimer
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _checkAndShowDisclaimer();
+    // });
   }
 
-  Future<void> _checkAndShowDisclaimer() async {
-    final hasSeen = await DisclaimerService.hasSeenDisclaimer();
-    if (!hasSeen && mounted) {
-      await MedicalDisclaimerDialog.show(context, isFirstLaunch: true);
-    }
-  }
+  // Future<void> _checkAndShowDisclaimer() async {
+  //   final hasSeen = await DisclaimerService.hasSeenDisclaimer();
+  //   if (!hasSeen && mounted) {
+  //     await MedicalDisclaimerDialog.show(context, isFirstLaunch: true);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -194,7 +193,7 @@ class _ResponsiveNavigationShell extends StatelessWidget {
             leading: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: Icon(
-                Icons.medical_services_outlined,
+                Icons.apps_outlined,
                 size: 32,
                 color: Theme.of(context).colorScheme.primary,
               ),

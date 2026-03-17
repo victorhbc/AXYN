@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../core/constants/app_strings.dart';
 import '../../data/data.dart';
-import '../../shared/shared.dart';
 import 'screens/screens.dart';
 import 'widgets/calculator_grid_item.dart';
 import 'widgets/edit_items_sheet.dart';
@@ -22,6 +21,7 @@ class _CalculosSectionState extends State<CalculosSection> {
   final CalculationStore _store = CalculationStore();
   CalculoItem? _selectedItem;
 
+  // Guideline 1.4.1 / 1.4.2: only IMC kept (neutral reference); medical/dosage calculators commented out
   static final List<CalculoItem> _allItems = [
     const CalculoItem(
       title: AppStrings.imcTitle,
@@ -31,86 +31,86 @@ class _CalculosSectionState extends State<CalculosSection> {
       storeKey: 'imc',
       resultUnit: '',
     ),
-    const CalculoItem(
-      title: AppStrings.clearanceTitle,
-      subtitle: AppStrings.clearanceSubtitle,
-      icon: Icons.water_drop_outlined,
-      page: CreatinineClearanceScreen(),
-      storeKey: 'creatinine_clearance',
-      resultUnit: 'mL/min',
-    ),
-    const CalculoItem(
-      title: AppStrings.dosePesoTitle,
-      subtitle: AppStrings.dosePesoSubtitle,
-      icon: Icons.medication_outlined,
-      page: DosePorPesoScreen(),
-      storeKey: 'dose_peso',
-      resultUnit: '',
-    ),
-    const CalculoItem(
-      title: AppStrings.intubationTitle,
-      subtitle: AppStrings.intubationSubtitle,
-      icon: Icons.airline_stops_outlined,
-      page: IntubationScreen(),
-      storeKey: 'intubation',
-      resultUnit: '',
-    ),
-    const CalculoItem(
-      title: AppStrings.glasgowTitle,
-      subtitle: AppStrings.glasgowSubtitle,
-      icon: Icons.psychology_outlined,
-      page: GlasgowScreen(),
-      storeKey: 'glasgow',
-      resultUnit: 'pts',
-    ),
-    const CalculoItem(
-      title: AppStrings.cha2ds2Title,
-      subtitle: AppStrings.cha2ds2Subtitle,
-      icon: Icons.favorite_outlined,
-      page: Cha2ds2VaScreen(),
-      storeKey: 'cha2ds2va',
-      resultUnit: 'pts',
-    ),
-    const CalculoItem(
-      title: AppStrings.hasBledTitle,
-      subtitle: AppStrings.hasBledSubtitle,
-      icon: Icons.bloodtype_outlined,
-      page: HasBledScreen(),
-      storeKey: 'hasbled',
-      resultUnit: 'pts',
-    ),
-    const CalculoItem(
-      title: AppStrings.wellsTitle,
-      subtitle: AppStrings.wellsSubtitle,
-      icon: Icons.air_outlined,
-      page: WellsTepScreen(),
-      storeKey: 'wells_tep',
-      resultUnit: 'pts',
-    ),
-    const CalculoItem(
-      title: AppStrings.sodiumTitle,
-      subtitle: AppStrings.sodiumSubtitle,
-      icon: Icons.science_outlined,
-      page: SodiumCorrectionScreen(),
-      storeKey: 'sodium_correction',
-      resultUnit: 'mEq/L',
-    ),
-    const CalculoItem(
-      title: AppStrings.osmolarityTitle,
-      subtitle: AppStrings.osmolaritySubtitle,
-      icon: Icons.opacity_outlined,
-      page: OsmolarityScreen(),
-      storeKey: 'osmolarity',
-      resultUnit: 'mOsm/L',
-    ),
-    const CalculoItem(
-      title: AppStrings.gestationalTitle,
-      subtitle: AppStrings.gestationalSubtitle,
-      icon: Icons.pregnant_woman_outlined,
-      page: GestationalAgeScreen(),
-      storeKey: 'gestational_age',
-      resultUnit: '',
-    ),
+    // const CalculoItem(
+    //   title: AppStrings.clearanceTitle,
+    //   subtitle: AppStrings.clearanceSubtitle,
+    //   icon: Icons.water_drop_outlined,
+    //   page: CreatinineClearanceScreen(),
+    //   storeKey: 'creatinine_clearance',
+    //   resultUnit: 'mL/min',
+    // ),
+    // const CalculoItem(
+    //   title: AppStrings.dosePesoTitle,
+    //   subtitle: AppStrings.dosePesoSubtitle,
+    //   icon: Icons.medication_outlined,
+    //   page: DosePorPesoScreen(),
+    //   storeKey: 'dose_peso',
+    //   resultUnit: '',
+    // ),
+    // const CalculoItem(
+    //   title: AppStrings.intubationTitle,
+    //   subtitle: AppStrings.intubationSubtitle,
+    //   icon: Icons.airline_stops_outlined,
+    //   page: IntubationScreen(),
+    //   storeKey: 'intubation',
+    //   resultUnit: '',
+    // ),
+    // const CalculoItem(
+    //   title: AppStrings.glasgowTitle,
+    //   subtitle: AppStrings.glasgowSubtitle,
+    //   icon: Icons.psychology_outlined,
+    //   page: GlasgowScreen(),
+    //   storeKey: 'glasgow',
+    //   resultUnit: 'pts',
+    // ),
+    // const CalculoItem(
+    //   title: AppStrings.cha2ds2Title,
+    //   subtitle: AppStrings.cha2ds2Subtitle,
+    //   icon: Icons.favorite_outlined,
+    //   page: Cha2ds2VaScreen(),
+    //   storeKey: 'cha2ds2va',
+    //   resultUnit: 'pts',
+    // ),
+    // const CalculoItem(
+    //   title: AppStrings.hasBledTitle,
+    //   subtitle: AppStrings.hasBledSubtitle,
+    //   icon: Icons.bloodtype_outlined,
+    //   page: HasBledScreen(),
+    //   storeKey: 'hasbled',
+    //   resultUnit: 'pts',
+    // ),
+    // const CalculoItem(
+    //   title: AppStrings.wellsTitle,
+    //   subtitle: AppStrings.wellsSubtitle,
+    //   icon: Icons.air_outlined,
+    //   page: WellsTepScreen(),
+    //   storeKey: 'wells_tep',
+    //   resultUnit: 'pts',
+    // ),
+    // const CalculoItem(
+    //   title: AppStrings.sodiumTitle,
+    //   subtitle: AppStrings.sodiumSubtitle,
+    //   icon: Icons.science_outlined,
+    //   page: SodiumCorrectionScreen(),
+    //   storeKey: 'sodium_correction',
+    //   resultUnit: 'mEq/L',
+    // ),
+    // const CalculoItem(
+    //   title: AppStrings.osmolarityTitle,
+    //   subtitle: AppStrings.osmolaritySubtitle,
+    //   icon: Icons.opacity_outlined,
+    //   page: OsmolarityScreen(),
+    //   storeKey: 'osmolarity',
+    //   resultUnit: 'mOsm/L',
+    // ),
+    // const CalculoItem(
+    //   title: AppStrings.gestationalTitle,
+    //   subtitle: AppStrings.gestationalSubtitle,
+    //   icon: Icons.pregnant_woman_outlined,
+    //   page: GestationalAgeScreen(),
+    //   storeKey: 'gestational_age',
+    //   resultUnit: '',
+    // ),
   ];
 
   List<CalculoItem> get _visibleItems {

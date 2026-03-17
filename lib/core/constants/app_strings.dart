@@ -1,13 +1,13 @@
 /// Application string constants
 abstract class AppStrings {
-  // App Info
+  // App Info (neutral wording for App Store guidelines 1.4.1 / 1.4.2)
   static const String appName = 'axys';
   static const String appVersion = '1.0.0';
   static const String appDescription =
-      'Calculadoras médicas e dosagens pediátricas para profissionais de saúde';
+      'Utilidades e calculadora de IMC para referência pessoal';
   static const String copyright = '© 2026 axys. Todos os direitos reservados.';
   static const String developerMessage =
-      'Desenvolvido com ❤️ para profissionais de saúde';
+      'Desenvolvido com ❤️';
 
   // Navigation
   static const String calculosTab = 'Cálculos';
@@ -36,9 +36,9 @@ abstract class AppStrings {
   static const String resultadoLimpo = 'Resultado limpo';
   static const String todosResultadosLimpos = 'Todos os resultados foram limpos';
 
-  // Calculators
+  // Calculators (wording neutral, not medical)
   static const String imcTitle = 'Calculadora IMC';
-  static const String imcSubtitle = 'Índice de Massa Corporal';
+  static const String imcSubtitle = 'Índice de Massa Corporal – referência informativa';
   static const String clearanceTitle = 'Clearance Creatinina';
   static const String clearanceSubtitle = 'Função Renal';
   static const String dosePesoTitle = 'Dose por Peso';

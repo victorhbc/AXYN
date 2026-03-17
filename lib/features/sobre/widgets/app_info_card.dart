@@ -43,7 +43,7 @@ class AppInfoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
       ),
       child: const Icon(
-        Icons.medical_services_outlined,
+        Icons.apps_outlined,
         size: 48,
         color: Colors.white,
       ),
