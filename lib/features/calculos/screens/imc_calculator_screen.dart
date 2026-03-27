@@ -169,6 +169,16 @@ class _ImcCalculatorScreenState extends State<ImcCalculatorScreen> {
                 onCalculate: _calcularIMC,
                 onClear: _limpar,
               ),
+              const SizedBox(height: 16),
+              Text(
+                'Fontes e referências',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              CitationLinkButton(calculatorName: 'IMC'),
               if (_imc != null) ...[
                 const SizedBox(height: 32),
                 ResultCard(
@@ -179,11 +189,6 @@ class _ImcCalculatorScreenState extends State<ImcCalculatorScreen> {
                 ),
                 const SizedBox(height: 24),
                 _buildImcTable(),
-                // Citações médicas comentadas para descaracterizar (guidelines)
-                // const SizedBox(height: 24),
-                // const Divider(),
-                // const SizedBox(height: 16),
-                // CitationLinkButton(calculatorName: 'IMC'),
               ],
             ],
           ),

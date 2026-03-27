@@ -6,6 +6,7 @@ import '../../features/calculos/calculos_section.dart';
 // Temporarily commented for App Store guidelines (1.4.1, 1.4.2) - medical/dosage features
 // import '../../features/pediatria/pediatria_section.dart';
 import '../../features/settings/settings_section.dart';
+import '../../features/settings/support_page.dart';
 import '../../shared/shared.dart';
 import '../constants/app_strings.dart';
 // import '../services/disclaimer_service.dart';
@@ -21,9 +22,17 @@ class AppRoutes {
 class AppRouter {
   AppRouter._();
 
+  static const String suporte = '/suporte';
+
   static final GoRouter router = GoRouter(
     initialLocation: AppRoutes.calculadoras,
     routes: [
+      GoRoute(
+        path: suporte,
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: SupportPage(),
+        ),
+      ),
       ShellRoute(
         builder: (context, state, child) {
           return MainShell(child: child);

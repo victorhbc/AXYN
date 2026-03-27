@@ -103,7 +103,7 @@ class MedicalCitations {
       year: '2000',
       volume: '894',
       pages: '1-253',
-      url: 'https://www.who.int/publications/i/item/924120894X',
+      url: 'https://www.who.int/data/gho/data/themes/topics/topic-details/GHO/body-mass-index?introPage=intro_3.html',
       category: 'General Medicine',
     ),
 
@@ -196,8 +196,8 @@ class MedicalCitations {
       case 'wells tep':
       case 'pulmonary embolism':
         return allCitations.where((c) => c.title.contains('Wells') || c.category == 'Emergency Medicine').toList();
-      case 'imc':
       case 'bmi':
+      case 'imc':
         return allCitations.where((c) => c.title.contains('BMI') || c.title.contains('Body Mass')).toList();
       case 'clearance':
       case 'creatinine':
