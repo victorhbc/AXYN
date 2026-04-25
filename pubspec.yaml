@@ -1,7 +1,7 @@
 name: axys
 description: "Calculadoras médicas e dosagens pediátricas para profissionais de saúde"
 publish_to: 'none'
-version: 1.0.0
+version: 1.0.5+1
 
 environment:
   sdk: ^3.10.7
